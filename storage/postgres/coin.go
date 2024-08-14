@@ -21,30 +21,34 @@ func NewCoinRepo(db *pgxpool.Pool) storage.CoinRepoI {
 	}
 }
 
-func (r *coinRepo) Create(ctx context.Context, req *coins_service.CreateCoin) error {
+func (r *coinRepo) Create(ctx context.Context, req *coins_service.CreateCoin) (resp *coins_service.CoinPrimaryKey, err error) {
 	var (
 		id    = uuid.NewString()
 		query = `
-		INSERT INTO "coins"(
-			"id",
-			"name",
-			"coin_icon",
-			"coin_buy_price",
-			"coin_sale_price",
-			"address"
-		) VALUES($1, $2, $3, $4, $5, $6)`
+			INSERT INTO "coins"(
+				"id",
+				"name",
+				"coin_buy_price",
+				"coin_sell_price",
+				"address",
+				"card_number",
+				"image",
+				"status"
+			) VALUES($1, $2, $3, $4, $5, $6, $7, $8)`
 	)
-	_, err := r.db.Exec(ctx,
+	_, err = r.db.Exec(ctx,
 		query,
 		id,
 		req.Name,
-		req.CoinIcon,
 		req.CoinBuyPrice,
-		req.CoinSalePrice,
+		req.CoinSellPrice,
 		req.Address,
+		req.CardNumber,
+		req.ImageId,
+		req.Status,
 	)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	if len(req.Halfcoins) > 0 {
@@ -70,13 +74,15 @@ func (r *coinRepo) Create(ctx context.Context, req *coins_service.CreateCoin) er
 				halfCoin.HalfCoinPrice,
 			)
 			if err != nil {
-				return err
+				return nil, err
 			}
 		}
 
 	}
 
-	return nil
+	return &coins_service.CoinPrimaryKey{
+		Id: id,
+	}, nil
 }
 
 func (r *coinRepo) GetByID(ctx context.Context, req *coins_service.CoinPrimaryKey) (*coins_service.Coin, error) {
@@ -84,10 +90,12 @@ func (r *coinRepo) GetByID(ctx context.Context, req *coins_service.CoinPrimaryKe
 		SELECT
 			"id",
 			"name",
-			"coin_icon",
 			"coin_buy_price",
-			"coin_sale_price",
+			"coin_sell_price",
 			"address",
+			"card_number",
+			"status",
+			"image",
 			"created_at",
 			"updated_at"
 		FROM "coins"
@@ -97,10 +105,12 @@ func (r *coinRepo) GetByID(ctx context.Context, req *coins_service.CoinPrimaryKe
 	var (
 		id              sql.NullString
 		name            sql.NullString
-		coin_icon       sql.NullString
 		coin_buy_price  sql.NullString
-		coin_sale_price sql.NullString
+		coin_sell_price sql.NullString
 		address         sql.NullString
+		image           sql.NullString
+		card_number     sql.NullString
+		status          sql.NullString
 		created_at      sql.NullString
 		updated_at      sql.NullString
 	)
@@ -108,10 +118,12 @@ func (r *coinRepo) GetByID(ctx context.Context, req *coins_service.CoinPrimaryKe
 	err := r.db.QueryRow(ctx, queryCoin, req.Id).Scan(
 		&id,
 		&name,
-		&coin_icon,
 		&coin_buy_price,
-		&coin_sale_price,
+		&coin_sell_price,
 		&address,
+		&card_number,
+		&status,
+		&image,
 		&created_at,
 		&updated_at,
 	)
@@ -157,11 +169,13 @@ func (r *coinRepo) GetByID(ctx context.Context, req *coins_service.CoinPrimaryKe
 	return &coins_service.Coin{
 		Id:            id.String,
 		Name:          name.String,
-		CoinIcon:      coin_icon.String,
 		CoinBuyPrice:  coin_buy_price.String,
-		CoinSalePrice: coin_sale_price.String,
-		Address:       address.String,
+		CoinSellPrice: coin_sell_price.String,
 		Halfcoins:     halfPrices,
+		Address:       address.String,
+		CardNumber:    card_number.String,
+		Status:        status.String,
+		ImageId:       image.String,
 		CreatedAt:     created_at.String,
 		UpdatedAt:     updated_at.String,
 	}, nil
@@ -194,10 +208,12 @@ func (r *coinRepo) GetAll(ctx context.Context, req *coins_service.GetListCoinReq
 			COUNT(*) OVER(),
 			"id",
 			"name",
-			"coin_icon",
 			"coin_buy_price",
-			"coin_sale_price",
+			"coin_sell_price",
 			"address",
+			"card_number",
+			"status",
+			"image",
 			"created_at",
 			"updated_at"
 		FROM "coins"
@@ -215,10 +231,12 @@ func (r *coinRepo) GetAll(ctx context.Context, req *coins_service.GetListCoinReq
 			coin            coins_service.Coin
 			id              sql.NullString
 			name            sql.NullString
-			coin_icon       sql.NullString
 			coin_buy_price  sql.NullString
-			coin_sale_price sql.NullString
+			coin_sell_price sql.NullString
 			address         sql.NullString
+			image           sql.NullString
+			card_number     sql.NullString
+			status          sql.NullString
 			created_at      sql.NullString
 			updated_at      sql.NullString
 		)
@@ -227,10 +245,12 @@ func (r *coinRepo) GetAll(ctx context.Context, req *coins_service.GetListCoinReq
 			&resp.Count,
 			&id,
 			&name,
-			&coin_icon,
 			&coin_buy_price,
-			&coin_sale_price,
+			&coin_sell_price,
 			&address,
+			&card_number,
+			&status,
+			&image,
 			&created_at,
 			&updated_at,
 		)
@@ -276,10 +296,12 @@ func (r *coinRepo) GetAll(ctx context.Context, req *coins_service.GetListCoinReq
 			Id:            id.String,
 			Name:          name.String,
 			CoinBuyPrice:  coin_buy_price.String,
-			CoinSalePrice: coin_sale_price.String,
-			Address:       address.String,
+			CoinSellPrice: coin_sell_price.String,
 			Halfcoins:     halfPrices,
-			CoinIcon:      coin_icon.String,
+			Address:       address.String,
+			CardNumber:    card_number.String,
+			Status:        status.String,
+			ImageId:       image.String,
 			CreatedAt:     created_at.String,
 			UpdatedAt:     updated_at.String,
 		}
@@ -296,9 +318,10 @@ func (r *coinRepo) Update(ctx context.Context, req *coins_service.UpdateCoin) (i
 			SET
 				"name" = $2,
 				"coin_buy_price" = $3,
-				"coin_sale_price" = $4,
+				"coin_sell_price" = $4,
 				"address" = $5,
-				"coin_icon" = $6,
+				"card_number" = $6,
+				"status" = $7,
 				"updated_at" = NOW()
 		WHERE "id" = $1`
 	)
@@ -308,9 +331,10 @@ func (r *coinRepo) Update(ctx context.Context, req *coins_service.UpdateCoin) (i
 		req.Id,
 		req.Name,
 		req.CoinBuyPrice,
-		req.CoinSalePrice,
+		req.CoinSellPrice,
 		req.Address,
-		req.CoinIcon,
+		req.CardNumber,
+		req.Status,
 	)
 	if err != nil {
 		return 0, err
@@ -354,7 +378,7 @@ func (r *coinRepo) Update(ctx context.Context, req *coins_service.UpdateCoin) (i
 }
 
 func (r *coinRepo) Delete(ctx context.Context, req *coins_service.CoinPrimaryKey) error {
-	_, err := r.db.Exec(ctx, `DELETE FROM "coins" WHERE id = $1`, req.Id)
 	_, _ = r.db.Exec(ctx, `DELETE FROM "half_coins_price" WHERE "coin_id" = $1`, req.Id)
+	_, err := r.db.Exec(ctx, `DELETE FROM "coins" WHERE id = $1`, req.Id)
 	return err
 }

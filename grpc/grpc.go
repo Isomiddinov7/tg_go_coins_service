@@ -15,6 +15,8 @@ import (
 func SetUpServer(cfg config.Config, log logger.LoggerI, strg storage.StorageI, srvc client.ServiceManagerI) (grpcServer *grpc.Server) {
 	grpcServer = grpc.NewServer()
 	coins_service.RegisterCoinsServiceServer(grpcServer, service.NewCoinService(cfg, log, strg, srvc))
+	coins_service.RegisterBuyOrSellServer(grpcServer, service.NewBuyOrSellService(cfg, log, strg, srvc))
+	coins_service.RegisterImagesServiceServer(grpcServer, service.NewImageService(cfg, log, strg, srvc))
 	reflection.Register(grpcServer)
 	return
 }

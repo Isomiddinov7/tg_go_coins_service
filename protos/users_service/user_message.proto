@@ -1,0 +1,27 @@
+syntax = "proto3";
+
+option go_package = "genproto/users_service";
+
+package users_service;
+import "user.proto";
+
+service UserMessageList{
+    rpc GetMessageList(UserPrimaryKey) returns(UserMessage){}
+}
+
+message UserMessage{
+    string id = 1;
+    string status = 2;
+    string coin_name = 3;
+    string coin_amount = 4;
+    string amount_price = 5;
+    string created_at = 6;
+    string updated_at = 7;
+    repeated Reply replies = 8;
+    int64 count = 9;
+}
+
+message Reply{
+    string text = 1;
+    string admin_img = 2;
+}

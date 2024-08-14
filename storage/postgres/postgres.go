@@ -10,8 +10,10 @@ import (
 )
 
 type Store struct {
-	db   *pgxpool.Pool
-	coin storage.CoinRepoI
+	db       *pgxpool.Pool
+	coin     storage.CoinRepoI
+	buy_sell storage.GetBuyOrSellRepoI
+	image    storage.ImagesRepoI
 }
 
 func NewPostgres(ctx context.Context, cfg config.Config) (storage.StorageI, error) {
@@ -49,4 +51,20 @@ func (s *Store) Coin() storage.CoinRepoI {
 	}
 
 	return s.coin
+}
+
+func (s *Store) GetBuyOrSell() storage.GetBuyOrSellRepoI {
+	if s.buy_sell == nil {
+		s.buy_sell = NewBuyOrSellRepo(s.db)
+	}
+
+	return s.buy_sell
+}
+
+func (s *Store) FileImage() storage.ImagesRepoI {
+	if s.image == nil {
+		s.image = NewFileImageRepo(s.db)
+	}
+
+	return s.image
 }

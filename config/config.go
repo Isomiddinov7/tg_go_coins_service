@@ -36,7 +36,7 @@ type Config struct {
 
 // Load ...
 func Load() Config {
-	if err := godotenv.Load("/ps_go_user_service.env"); err != nil {
+	if err := godotenv.Load("/ps_go_coin_service.env"); err != nil {
 		fmt.Println("No .env file found")
 	}
 
@@ -50,7 +50,7 @@ func Load() Config {
 	config.PostgresPort = cast.ToInt(getOrReturnDefaultValue("POSTGRES_PORT", 5432))
 	config.PostgresUser = cast.ToString(getOrReturnDefaultValue("POSTGRES_USER", "bahodir"))
 	config.PostgresPassword = cast.ToString(getOrReturnDefaultValue("POSTGRES_PASSWORD", "1100"))
-	config.PostgresDatabase = cast.ToString(getOrReturnDefaultValue("POSTGRES_DATABASE", "tg_go_coins_service"))
+	config.PostgresDatabase = cast.ToString(getOrReturnDefaultValue("POSTGRES_DATABASE", "telegram_bot"))
 	config.PostgresMaxConnections = cast.ToInt32(getOrReturnDefaultValue("POSTGRES_MAX_CONNECTIONS", 30))
 
 	config.CoinsServiceHost = cast.ToString(getOrReturnDefaultValue("COINS_SERVICE_HOST", "localhost"))

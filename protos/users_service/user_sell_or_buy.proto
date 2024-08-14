@@ -1,0 +1,31 @@
+syntax = "proto3";
+
+option go_package = "genproto/users_service";
+
+package users_service;
+service UserSellOrBuyService{
+    rpc UserSell(UserSellRequest) returns (UserBuySellImgPrimaryKey){}
+    rpc UserBuy(UserBuyRequest) returns(UserBuySellImgPrimaryKey){}
+}
+
+message UserBuySellImgPrimaryKey{
+    string img_id = 1;
+}
+
+message UserSellRequest{
+    string user_id = 1;
+    string coin_id = 2;
+    string coin_amount = 3;
+    string message = 4;
+    string card_number = 5;
+    string coin_img = 6;
+}
+
+message UserBuyRequest{
+    string user_id = 1;
+    string coin_id = 2;
+    string address = 3;
+    string coin_amount = 4;
+    string message = 5;
+    string pay_img = 6;
+}

@@ -29,16 +29,16 @@ func NewCoinService(cfg config.Config, log logger.LoggerI, strg storage.StorageI
 	}
 }
 
-func (i *CoinService) Create(ctx context.Context, req *coins_service.CreateCoin) (resp *coins_service.Coin, err error) {
+func (i *CoinService) Create(ctx context.Context, req *coins_service.CreateCoin) (resp *coins_service.CoinPrimaryKey, err error) {
 
 	i.log.Info("---CreateCoin------>", logger.Any("req", req))
-	err = i.strg.Coin().Create(ctx, req)
+	resp, err = i.strg.Coin().Create(ctx, req)
 	if err != nil {
 		i.log.Error("!!!CreateCoin->Coin->Create--->", logger.Error(err))
 		return nil, status.Error(codes.InvalidArgument, err.Error())
 	}
 
-	return
+	return resp, nil
 }
 
 func (i *CoinService) GetById(ctx context.Context, req *coins_service.CoinPrimaryKey) (resp *coins_service.Coin, err error) {

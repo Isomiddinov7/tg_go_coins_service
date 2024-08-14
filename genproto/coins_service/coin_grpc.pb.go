@@ -30,7 +30,7 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type CoinsServiceClient interface {
-	Create(ctx context.Context, in *CreateCoin, opts ...grpc.CallOption) (*Coin, error)
+	Create(ctx context.Context, in *CreateCoin, opts ...grpc.CallOption) (*CoinPrimaryKey, error)
 	GetById(ctx context.Context, in *CoinPrimaryKey, opts ...grpc.CallOption) (*Coin, error)
 	GetList(ctx context.Context, in *GetListCoinRequest, opts ...grpc.CallOption) (*GetListCoinResponse, error)
 	Update(ctx context.Context, in *UpdateCoin, opts ...grpc.CallOption) (*Coin, error)
@@ -45,8 +45,8 @@ func NewCoinsServiceClient(cc grpc.ClientConnInterface) CoinsServiceClient {
 	return &coinsServiceClient{cc}
 }
 
-func (c *coinsServiceClient) Create(ctx context.Context, in *CreateCoin, opts ...grpc.CallOption) (*Coin, error) {
-	out := new(Coin)
+func (c *coinsServiceClient) Create(ctx context.Context, in *CreateCoin, opts ...grpc.CallOption) (*CoinPrimaryKey, error) {
+	out := new(CoinPrimaryKey)
 	err := c.cc.Invoke(ctx, CoinsService_Create_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -94,7 +94,7 @@ func (c *coinsServiceClient) Delete(ctx context.Context, in *CoinPrimaryKey, opt
 // All implementations must embed UnimplementedCoinsServiceServer
 // for forward compatibility
 type CoinsServiceServer interface {
-	Create(context.Context, *CreateCoin) (*Coin, error)
+	Create(context.Context, *CreateCoin) (*CoinPrimaryKey, error)
 	GetById(context.Context, *CoinPrimaryKey) (*Coin, error)
 	GetList(context.Context, *GetListCoinRequest) (*GetListCoinResponse, error)
 	Update(context.Context, *UpdateCoin) (*Coin, error)
@@ -106,7 +106,7 @@ type CoinsServiceServer interface {
 type UnimplementedCoinsServiceServer struct {
 }
 
-func (UnimplementedCoinsServiceServer) Create(context.Context, *CreateCoin) (*Coin, error) {
+func (UnimplementedCoinsServiceServer) Create(context.Context, *CreateCoin) (*CoinPrimaryKey, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Create not implemented")
 }
 func (UnimplementedCoinsServiceServer) GetById(context.Context, *CoinPrimaryKey) (*Coin, error) {
