@@ -19,16 +19,20 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	UserSellOrBuyService_UserSell_FullMethodName = "/users_service.UserSellOrBuyService/UserSell"
-	UserSellOrBuyService_UserBuy_FullMethodName  = "/users_service.UserSellOrBuyService/UserBuy"
+	UserSellOrBuyService_UserSell_FullMethodName    = "/users_service.UserSellOrBuyService/UserSell"
+	UserSellOrBuyService_UserBuy_FullMethodName     = "/users_service.UserSellOrBuyService/UserBuy"
+	UserSellOrBuyService_AllUserSell_FullMethodName = "/users_service.UserSellOrBuyService/AllUserSell"
+	UserSellOrBuyService_AllUserBuy_FullMethodName  = "/users_service.UserSellOrBuyService/AllUserBuy"
 )
 
 // UserSellOrBuyServiceClient is the client API for UserSellOrBuyService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type UserSellOrBuyServiceClient interface {
-	UserSell(ctx context.Context, in *UserSellRequest, opts ...grpc.CallOption) (*UserBuySellImgPrimaryKey, error)
-	UserBuy(ctx context.Context, in *UserBuyRequest, opts ...grpc.CallOption) (*UserBuySellImgPrimaryKey, error)
+	UserSell(ctx context.Context, in *UserSellRequest, opts ...grpc.CallOption) (*Empty, error)
+	UserBuy(ctx context.Context, in *UserBuyRequest, opts ...grpc.CallOption) (*Empty, error)
+	AllUserSell(ctx context.Context, in *GetListUserTransactionRequest, opts ...grpc.CallOption) (*GetListUserSellTransactionResponse, error)
+	AllUserBuy(ctx context.Context, in *GetListUserTransactionRequest, opts ...grpc.CallOption) (*GetListUserBuyTransactionResponse, error)
 }
 
 type userSellOrBuyServiceClient struct {
@@ -39,8 +43,8 @@ func NewUserSellOrBuyServiceClient(cc grpc.ClientConnInterface) UserSellOrBuySer
 	return &userSellOrBuyServiceClient{cc}
 }
 
-func (c *userSellOrBuyServiceClient) UserSell(ctx context.Context, in *UserSellRequest, opts ...grpc.CallOption) (*UserBuySellImgPrimaryKey, error) {
-	out := new(UserBuySellImgPrimaryKey)
+func (c *userSellOrBuyServiceClient) UserSell(ctx context.Context, in *UserSellRequest, opts ...grpc.CallOption) (*Empty, error) {
+	out := new(Empty)
 	err := c.cc.Invoke(ctx, UserSellOrBuyService_UserSell_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -48,9 +52,27 @@ func (c *userSellOrBuyServiceClient) UserSell(ctx context.Context, in *UserSellR
 	return out, nil
 }
 
-func (c *userSellOrBuyServiceClient) UserBuy(ctx context.Context, in *UserBuyRequest, opts ...grpc.CallOption) (*UserBuySellImgPrimaryKey, error) {
-	out := new(UserBuySellImgPrimaryKey)
+func (c *userSellOrBuyServiceClient) UserBuy(ctx context.Context, in *UserBuyRequest, opts ...grpc.CallOption) (*Empty, error) {
+	out := new(Empty)
 	err := c.cc.Invoke(ctx, UserSellOrBuyService_UserBuy_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userSellOrBuyServiceClient) AllUserSell(ctx context.Context, in *GetListUserTransactionRequest, opts ...grpc.CallOption) (*GetListUserSellTransactionResponse, error) {
+	out := new(GetListUserSellTransactionResponse)
+	err := c.cc.Invoke(ctx, UserSellOrBuyService_AllUserSell_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userSellOrBuyServiceClient) AllUserBuy(ctx context.Context, in *GetListUserTransactionRequest, opts ...grpc.CallOption) (*GetListUserBuyTransactionResponse, error) {
+	out := new(GetListUserBuyTransactionResponse)
+	err := c.cc.Invoke(ctx, UserSellOrBuyService_AllUserBuy_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -61,8 +83,10 @@ func (c *userSellOrBuyServiceClient) UserBuy(ctx context.Context, in *UserBuyReq
 // All implementations must embed UnimplementedUserSellOrBuyServiceServer
 // for forward compatibility
 type UserSellOrBuyServiceServer interface {
-	UserSell(context.Context, *UserSellRequest) (*UserBuySellImgPrimaryKey, error)
-	UserBuy(context.Context, *UserBuyRequest) (*UserBuySellImgPrimaryKey, error)
+	UserSell(context.Context, *UserSellRequest) (*Empty, error)
+	UserBuy(context.Context, *UserBuyRequest) (*Empty, error)
+	AllUserSell(context.Context, *GetListUserTransactionRequest) (*GetListUserSellTransactionResponse, error)
+	AllUserBuy(context.Context, *GetListUserTransactionRequest) (*GetListUserBuyTransactionResponse, error)
 	mustEmbedUnimplementedUserSellOrBuyServiceServer()
 }
 
@@ -70,11 +94,17 @@ type UserSellOrBuyServiceServer interface {
 type UnimplementedUserSellOrBuyServiceServer struct {
 }
 
-func (UnimplementedUserSellOrBuyServiceServer) UserSell(context.Context, *UserSellRequest) (*UserBuySellImgPrimaryKey, error) {
+func (UnimplementedUserSellOrBuyServiceServer) UserSell(context.Context, *UserSellRequest) (*Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UserSell not implemented")
 }
-func (UnimplementedUserSellOrBuyServiceServer) UserBuy(context.Context, *UserBuyRequest) (*UserBuySellImgPrimaryKey, error) {
+func (UnimplementedUserSellOrBuyServiceServer) UserBuy(context.Context, *UserBuyRequest) (*Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UserBuy not implemented")
+}
+func (UnimplementedUserSellOrBuyServiceServer) AllUserSell(context.Context, *GetListUserTransactionRequest) (*GetListUserSellTransactionResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AllUserSell not implemented")
+}
+func (UnimplementedUserSellOrBuyServiceServer) AllUserBuy(context.Context, *GetListUserTransactionRequest) (*GetListUserBuyTransactionResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AllUserBuy not implemented")
 }
 func (UnimplementedUserSellOrBuyServiceServer) mustEmbedUnimplementedUserSellOrBuyServiceServer() {}
 
@@ -125,6 +155,42 @@ func _UserSellOrBuyService_UserBuy_Handler(srv interface{}, ctx context.Context,
 	return interceptor(ctx, in, info, handler)
 }
 
+func _UserSellOrBuyService_AllUserSell_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetListUserTransactionRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserSellOrBuyServiceServer).AllUserSell(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: UserSellOrBuyService_AllUserSell_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserSellOrBuyServiceServer).AllUserSell(ctx, req.(*GetListUserTransactionRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _UserSellOrBuyService_AllUserBuy_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetListUserTransactionRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserSellOrBuyServiceServer).AllUserBuy(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: UserSellOrBuyService_AllUserBuy_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserSellOrBuyServiceServer).AllUserBuy(ctx, req.(*GetListUserTransactionRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // UserSellOrBuyService_ServiceDesc is the grpc.ServiceDesc for UserSellOrBuyService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -139,6 +205,14 @@ var UserSellOrBuyService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "UserBuy",
 			Handler:    _UserSellOrBuyService_UserBuy_Handler,
+		},
+		{
+			MethodName: "AllUserSell",
+			Handler:    _UserSellOrBuyService_AllUserSell_Handler,
+		},
+		{
+			MethodName: "AllUserBuy",
+			Handler:    _UserSellOrBuyService_AllUserBuy_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

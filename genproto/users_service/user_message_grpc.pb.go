@@ -19,14 +19,22 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	UserMessageList_GetMessageList_FullMethodName = "/users_service.UserMessageList/GetMessageList"
+	UserMessageList_CreateUserMessage_FullMethodName  = "/users_service.UserMessageList/CreateUserMessage"
+	UserMessageList_CreateAdminMessage_FullMethodName = "/users_service.UserMessageList/CreateAdminMessage"
+	UserMessageList_UpdateMessage_FullMethodName      = "/users_service.UserMessageList/UpdateMessage"
+	UserMessageList_GetUserMessage_FullMethodName     = "/users_service.UserMessageList/GetUserMessage"
+	UserMessageList_GetAdminAllMessage_FullMethodName = "/users_service.UserMessageList/GetAdminAllMessage"
 )
 
 // UserMessageListClient is the client API for UserMessageList service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type UserMessageListClient interface {
-	GetMessageList(ctx context.Context, in *UserPrimaryKey, opts ...grpc.CallOption) (*UserMessage, error)
+	CreateUserMessage(ctx context.Context, in *MessageRequest, opts ...grpc.CallOption) (*Empty, error)
+	CreateAdminMessage(ctx context.Context, in *MessageRequest, opts ...grpc.CallOption) (*Empty, error)
+	UpdateMessage(ctx context.Context, in *UpdateMessageRequest, opts ...grpc.CallOption) (*Empty, error)
+	GetUserMessage(ctx context.Context, in *GetMessageUserRequest, opts ...grpc.CallOption) (*GetMessageUserResponse, error)
+	GetAdminAllMessage(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*GetMessageAdminResponse, error)
 }
 
 type userMessageListClient struct {
@@ -37,9 +45,45 @@ func NewUserMessageListClient(cc grpc.ClientConnInterface) UserMessageListClient
 	return &userMessageListClient{cc}
 }
 
-func (c *userMessageListClient) GetMessageList(ctx context.Context, in *UserPrimaryKey, opts ...grpc.CallOption) (*UserMessage, error) {
-	out := new(UserMessage)
-	err := c.cc.Invoke(ctx, UserMessageList_GetMessageList_FullMethodName, in, out, opts...)
+func (c *userMessageListClient) CreateUserMessage(ctx context.Context, in *MessageRequest, opts ...grpc.CallOption) (*Empty, error) {
+	out := new(Empty)
+	err := c.cc.Invoke(ctx, UserMessageList_CreateUserMessage_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userMessageListClient) CreateAdminMessage(ctx context.Context, in *MessageRequest, opts ...grpc.CallOption) (*Empty, error) {
+	out := new(Empty)
+	err := c.cc.Invoke(ctx, UserMessageList_CreateAdminMessage_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userMessageListClient) UpdateMessage(ctx context.Context, in *UpdateMessageRequest, opts ...grpc.CallOption) (*Empty, error) {
+	out := new(Empty)
+	err := c.cc.Invoke(ctx, UserMessageList_UpdateMessage_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userMessageListClient) GetUserMessage(ctx context.Context, in *GetMessageUserRequest, opts ...grpc.CallOption) (*GetMessageUserResponse, error) {
+	out := new(GetMessageUserResponse)
+	err := c.cc.Invoke(ctx, UserMessageList_GetUserMessage_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userMessageListClient) GetAdminAllMessage(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*GetMessageAdminResponse, error) {
+	out := new(GetMessageAdminResponse)
+	err := c.cc.Invoke(ctx, UserMessageList_GetAdminAllMessage_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -50,7 +94,11 @@ func (c *userMessageListClient) GetMessageList(ctx context.Context, in *UserPrim
 // All implementations must embed UnimplementedUserMessageListServer
 // for forward compatibility
 type UserMessageListServer interface {
-	GetMessageList(context.Context, *UserPrimaryKey) (*UserMessage, error)
+	CreateUserMessage(context.Context, *MessageRequest) (*Empty, error)
+	CreateAdminMessage(context.Context, *MessageRequest) (*Empty, error)
+	UpdateMessage(context.Context, *UpdateMessageRequest) (*Empty, error)
+	GetUserMessage(context.Context, *GetMessageUserRequest) (*GetMessageUserResponse, error)
+	GetAdminAllMessage(context.Context, *Empty) (*GetMessageAdminResponse, error)
 	mustEmbedUnimplementedUserMessageListServer()
 }
 
@@ -58,8 +106,20 @@ type UserMessageListServer interface {
 type UnimplementedUserMessageListServer struct {
 }
 
-func (UnimplementedUserMessageListServer) GetMessageList(context.Context, *UserPrimaryKey) (*UserMessage, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetMessageList not implemented")
+func (UnimplementedUserMessageListServer) CreateUserMessage(context.Context, *MessageRequest) (*Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateUserMessage not implemented")
+}
+func (UnimplementedUserMessageListServer) CreateAdminMessage(context.Context, *MessageRequest) (*Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateAdminMessage not implemented")
+}
+func (UnimplementedUserMessageListServer) UpdateMessage(context.Context, *UpdateMessageRequest) (*Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateMessage not implemented")
+}
+func (UnimplementedUserMessageListServer) GetUserMessage(context.Context, *GetMessageUserRequest) (*GetMessageUserResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetUserMessage not implemented")
+}
+func (UnimplementedUserMessageListServer) GetAdminAllMessage(context.Context, *Empty) (*GetMessageAdminResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetAdminAllMessage not implemented")
 }
 func (UnimplementedUserMessageListServer) mustEmbedUnimplementedUserMessageListServer() {}
 
@@ -74,20 +134,92 @@ func RegisterUserMessageListServer(s grpc.ServiceRegistrar, srv UserMessageListS
 	s.RegisterService(&UserMessageList_ServiceDesc, srv)
 }
 
-func _UserMessageList_GetMessageList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(UserPrimaryKey)
+func _UserMessageList_CreateUserMessage_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MessageRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(UserMessageListServer).GetMessageList(ctx, in)
+		return srv.(UserMessageListServer).CreateUserMessage(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: UserMessageList_GetMessageList_FullMethodName,
+		FullMethod: UserMessageList_CreateUserMessage_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserMessageListServer).GetMessageList(ctx, req.(*UserPrimaryKey))
+		return srv.(UserMessageListServer).CreateUserMessage(ctx, req.(*MessageRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _UserMessageList_CreateAdminMessage_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MessageRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserMessageListServer).CreateAdminMessage(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: UserMessageList_CreateAdminMessage_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserMessageListServer).CreateAdminMessage(ctx, req.(*MessageRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _UserMessageList_UpdateMessage_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateMessageRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserMessageListServer).UpdateMessage(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: UserMessageList_UpdateMessage_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserMessageListServer).UpdateMessage(ctx, req.(*UpdateMessageRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _UserMessageList_GetUserMessage_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetMessageUserRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserMessageListServer).GetUserMessage(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: UserMessageList_GetUserMessage_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserMessageListServer).GetUserMessage(ctx, req.(*GetMessageUserRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _UserMessageList_GetAdminAllMessage_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Empty)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserMessageListServer).GetAdminAllMessage(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: UserMessageList_GetAdminAllMessage_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserMessageListServer).GetAdminAllMessage(ctx, req.(*Empty))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -100,8 +232,24 @@ var UserMessageList_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*UserMessageListServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "GetMessageList",
-			Handler:    _UserMessageList_GetMessageList_Handler,
+			MethodName: "CreateUserMessage",
+			Handler:    _UserMessageList_CreateUserMessage_Handler,
+		},
+		{
+			MethodName: "CreateAdminMessage",
+			Handler:    _UserMessageList_CreateAdminMessage_Handler,
+		},
+		{
+			MethodName: "UpdateMessage",
+			Handler:    _UserMessageList_UpdateMessage_Handler,
+		},
+		{
+			MethodName: "GetUserMessage",
+			Handler:    _UserMessageList_GetUserMessage_Handler,
+		},
+		{
+			MethodName: "GetAdminAllMessage",
+			Handler:    _UserMessageList_GetAdminAllMessage_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

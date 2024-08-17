@@ -35,7 +35,7 @@ func (i *BuyOrSellService) GetSell(ctx context.Context, req *coins_service.BuyOr
 
 	resp, err = i.strg.GetBuyOrSell().GetSell(ctx, req)
 	if err != nil {
-		i.log.Error("!!!GetCoins Sell->Coin Selll->Get--->", logger.Error(err))
+		i.log.Error("!!!GetCoins Sell->Coin Sell->Get--->", logger.Error(err))
 		return nil, status.Error(codes.InvalidArgument, err.Error())
 	}
 

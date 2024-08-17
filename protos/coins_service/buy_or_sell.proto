@@ -36,7 +36,7 @@ message UserBuy{
 
 message UserSell{
     string id = 1;
-    string user_address = 2;
+    string card_number = 2;
     string price = 3;
     string amount_coin = 4;
     string coin_price = 5;

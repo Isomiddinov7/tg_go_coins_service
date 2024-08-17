@@ -25,8 +25,8 @@ func (r *buysellRepo) GetSell(ctx context.Context, req *coins_service.BuyOrSellR
 		queryAdmin = `
 				SELECT
 					"address"
-				FROM "admin_address"
-				WHERE "coin_id" = $1
+				FROM "coins"
+				WHERE "id" = $1
 			`
 		admin_address sql.NullString
 	)
@@ -112,9 +112,9 @@ func (r *buysellRepo) GetBuy(ctx context.Context, req *coins_service.BuyOrSellRe
 	var (
 		queryAdmin = `
 				SELECT
-					"address"
-				FROM "admin_address"
-				WHERE "coin_id" = $1
+					"card_number"
+				FROM "coins"
+				WHERE "id" = $1
 			`
 		admin_address sql.NullString
 	)
@@ -196,13 +196,3 @@ func (r *buysellRepo) GetBuy(ctx context.Context, req *coins_service.BuyOrSellRe
 		AmountPrice:  cast.ToString(summ),
 	}, nil
 }
-
-// {
-// 	coinId : "",
-// 	coinName :"",
-// 	coinbuyPrice:"",
-// 	coinSellPrice:"",
-// 	coinStatus : false,
-// 	coinAddress : "",
-// 	coinPaymtCard : "",
-// }
