@@ -61,8 +61,7 @@ func (i *CoinService) GetList(ctx context.Context, req *coins_service.GetListCoi
 		i.log.Error("!!!GetCoins->Coin->Get--->", logger.Error(err))
 		return nil, status.Error(codes.InvalidArgument, err.Error())
 	}
-
-	return
+	return resp, nil
 }
 
 func (i *CoinService) Update(ctx context.Context, req *coins_service.UpdateCoin) (resp *coins_service.Coin, err error) {

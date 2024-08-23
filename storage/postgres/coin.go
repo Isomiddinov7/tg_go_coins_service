@@ -221,12 +221,13 @@ func (r *coinRepo) GetAll(ctx context.Context, req *coins_service.GetListCoinReq
 
 	query += where + sort + offset + limit
 
-	rows, err := r.db.Query(ctx, query)
+	rowsCoins, err := r.db.Query(ctx, query)
 	if err != nil {
 		return nil, err
 	}
+	defer rowsCoins.Close() 
 
-	for rows.Next() {
+	for rowsCoins.Next() {
 		var (
 			coin            coins_service.Coin
 			id              sql.NullString
@@ -241,7 +242,7 @@ func (r *coinRepo) GetAll(ctx context.Context, req *coins_service.GetListCoinReq
 			updated_at      sql.NullString
 		)
 
-		err = rows.Scan(
+		err = rowsCoins.Scan(
 			&resp.Count,
 			&id,
 			&name,
@@ -257,29 +258,30 @@ func (r *coinRepo) GetAll(ctx context.Context, req *coins_service.GetListCoinReq
 		if err != nil {
 			return nil, err
 		}
-		var (
-			queryHalf = `
-				SELECT
-					"halfCoinAmount",
-					"halfCoinPrice"
-				FROM "half_coins_price"
-				WHERE "coin_id" = $1
-			`
-		)
 
-		rows, err := r.db.Query(ctx, queryHalf, id.String)
+		queryHalf := `
+			SELECT
+				"halfCoinAmount",
+				"halfCoinPrice"
+			FROM "half_coins_price"
+			WHERE "coin_id" = $1
+		`
+
+		rowsHalf, err := r.db.Query(ctx, queryHalf, id.String)
 		if err != nil {
 			return nil, err
 		}
+		defer rowsHalf.Close()
+
 		halfPrices := []*coins_service.HalfCoinPrice{}
-		for rows.Next() {
+		for rowsHalf.Next() {
 			var (
 				halfPrice      = &coins_service.HalfCoinPrice{}
 				halfCoinAmount sql.NullString
 				halfCoinPrice  sql.NullString
 			)
 
-			err = rows.Scan(
+			err = rowsHalf.Scan(
 				&halfCoinAmount,
 				&halfCoinPrice,
 			)
@@ -292,6 +294,7 @@ func (r *coinRepo) GetAll(ctx context.Context, req *coins_service.GetListCoinReq
 			}
 			halfPrices = append(halfPrices, halfPrice)
 		}
+
 		coin = coins_service.Coin{
 			Id:            id.String,
 			Name:          name.String,
