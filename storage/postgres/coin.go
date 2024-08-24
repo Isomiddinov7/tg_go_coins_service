@@ -225,7 +225,7 @@ func (r *coinRepo) GetAll(ctx context.Context, req *coins_service.GetListCoinReq
 	if err != nil {
 		return nil, err
 	}
-	defer rowsCoins.Close() 
+	defer rowsCoins.Close()
 
 	for rowsCoins.Next() {
 		var (

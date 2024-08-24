@@ -14,6 +14,7 @@ type Store struct {
 	coin     storage.CoinRepoI
 	buy_sell storage.GetBuyOrSellRepoI
 	image    storage.ImagesRepoI
+	history  storage.HistoryUserRepoI
 }
 
 func NewPostgres(ctx context.Context, cfg config.Config) (storage.StorageI, error) {
@@ -67,4 +68,12 @@ func (s *Store) FileImage() storage.ImagesRepoI {
 	}
 
 	return s.image
+}
+
+func (s *Store) History() storage.HistoryUserRepoI {
+	if s.history == nil {
+		s.history = NewHistoryRepo(s.db)
+	}
+
+	return s.history
 }
