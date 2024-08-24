@@ -1,5 +1,7 @@
 CREATE TYPE StatusUser AS ENUM('active', 'inactive');
 CREATE TYPE BuyOrSell AS ENUM('buy', 'sell');
+CREATE TYPE MessageStatus AS ENUM('user', 'admin');
+CREATE TYPE MessageReadStatus AS ENUM('false', 'true');
 
 CREATE TABLE IF NOT EXISTS "super_admin"(
     "id" UUID NOT NULL PRIMARY KEY,
@@ -16,12 +18,12 @@ CREATE TABLE IF NOT EXISTS "images"(
 CREATE TABLE IF NOT EXISTS "coins"(
     "id" UUID NOT NULL PRIMARY KEY,
     "name" VARCHAR NOT NULL,
+    "coin_icon" UUID NOT NULL REFERENCES "images"("id"),
     "coin_buy_price" VARCHAR NOT NULL,
     "coin_sell_price" VARCHAR NOT NULL,
     "address" VARCHAR,
     "card_number" VARCHAR,
-    "status" VARCHAR DEFAULT false,
-    "image" UUID NOT NULL REFERENCES "images"("id"),
+    "status" BOOLEAN DEFAULT false,
     "created_at" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP
 );
@@ -61,7 +63,6 @@ CREATE TABLE IF NOT EXISTS "admin_address"(
     "updated_at" TIMESTAMP
 );
 
-
 CREATE TABLE IF NOT EXISTS "user_transaction"(
     "id" UUID NOT NULL PRIMARY KEY,
     "coin_id" UUID NOT NULL REFERENCES "coins"("id"),
@@ -78,8 +79,30 @@ CREATE TABLE IF NOT EXISTS "user_transaction"(
     "updated_at" TIMESTAMP
 );
 
+CREATE TABLE IF NOT EXISTS "messages"(
+    "id" UUID NOT NULL PRIMARY KEY,
+    "status" MessageStatus NOT NULL,
+    "message" TEXT NOT NULL,
+    "read" MessageReadStatus NOT NULL,
+    "admin_id" UUID NOT NULL REFERENCES "admin"("id"),
+    "user_id" UUID NOT NULL REFERENCES "users"("id"), 
+    "file" UUID  REFERENCES "images"("id"),
+    "created_at" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP
+);
 
 -- INSERT INTO "admin"("id", "login", "password") VALUES('dbecf401-64b3-4b9b-829a-c8b061431286', 'bahodir2809', '123456789');
 
-
 -- INSERT INTO "admin_address"("admin_id", "coin_id", "address") VALUES('dbecf401-64b3-4b9b-829a-c8b061431286', 'ecd98c25-4cd3-41f7-8526-5efe021533f7', 'addres$$TON');
+
+-- CREATE TABLE IF NOT EXISTS "sell_coin"(
+--     "user_id" UUID NOT NULL REFERENCES "users"("id"),
+--     "coin_id" UUID NOT NULL REFERENCES "coins"("id"),
+--     "address" VARCHAR NOT NULL,
+--     "coin_amount" VARCHAR NOT NULL,
+--     "number_of_card" VARCHAR NOT NULL,
+--     "check_img" TEXT,
+--     "price" VARCHAR NOT NULL,
+--     "created_at" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+--     "updated_at" TIMESTAMP
+-- );
