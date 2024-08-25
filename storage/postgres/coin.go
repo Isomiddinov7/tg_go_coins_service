@@ -32,7 +32,7 @@ func (r *coinRepo) Create(ctx context.Context, req *coins_service.CreateCoin) (r
 				"coin_sell_price",
 				"address",
 				"card_number",
-				"image",
+				"coin_icon",
 				"status"
 			) VALUES($1, $2, $3, $4, $5, $6, $7, $8)`
 	)
@@ -95,7 +95,7 @@ func (r *coinRepo) GetByID(ctx context.Context, req *coins_service.CoinPrimaryKe
 			"address",
 			"card_number",
 			"status",
-			"image",
+			"coin_icon",
 			"created_at",
 			"updated_at"
 		FROM "coins"
@@ -213,7 +213,7 @@ func (r *coinRepo) GetAll(ctx context.Context, req *coins_service.GetListCoinReq
 			"address",
 			"card_number",
 			"status",
-			"image",
+			"coin_icon",
 			"created_at",
 			"updated_at"
 		FROM "coins"
