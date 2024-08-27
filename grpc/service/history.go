@@ -29,7 +29,7 @@ func NewHistoryService(cfg config.Config, log logger.LoggerI, strg storage.Stora
 	}
 }
 
-func (i *CoinService) UserHistory(ctx context.Context, req *coins_service.HistoryUserRequest) (resp *coins_service.HistoryUserResponse, err error) {
+func (i *HistoryService) UserHistory(ctx context.Context, req *coins_service.HistoryUserRequest) (resp *coins_service.HistoryUserResponse, err error) {
 
 	i.log.Info("---UserHistory------>", logger.Any("req", req))
 
