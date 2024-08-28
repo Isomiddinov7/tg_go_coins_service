@@ -31,7 +31,7 @@ func (r *historyRepo) HistoryUser(ctx context.Context, req *coins_service.Histor
 				coin_price,
 				all_price,
 				user_address,
-				payment_card
+				payment_card,
 				created_at
 			FROM "user_transaction"
 			WHERE user_id = $1
