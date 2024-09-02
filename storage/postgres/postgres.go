@@ -13,7 +13,6 @@ type Store struct {
 	db       *pgxpool.Pool
 	coin     storage.CoinRepoI
 	buy_sell storage.GetBuyOrSellRepoI
-	image    storage.ImagesRepoI
 	history  storage.HistoryUserRepoI
 }
 
@@ -62,13 +61,13 @@ func (s *Store) GetBuyOrSell() storage.GetBuyOrSellRepoI {
 	return s.buy_sell
 }
 
-func (s *Store) FileImage() storage.ImagesRepoI {
-	if s.image == nil {
-		s.image = NewFileImageRepo(s.db)
-	}
+// func (s *Store) FileImage() storage.ImagesRepoI {
+// 	if s.image == nil {
+// 		s.image = NewFileImageRepo(s.db)
+// 	}
 
-	return s.image
-}
+// 	return s.image
+// }
 
 func (s *Store) History() storage.HistoryUserRepoI {
 	if s.history == nil {

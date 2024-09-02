@@ -9,7 +9,6 @@ type StorageI interface {
 	CloseDB()
 	Coin() CoinRepoI
 	GetBuyOrSell() GetBuyOrSellRepoI
-	FileImage() ImagesRepoI
 	History() HistoryUserRepoI
 }
 
@@ -24,11 +23,6 @@ type CoinRepoI interface {
 type GetBuyOrSellRepoI interface {
 	GetSell(ctx context.Context, req *coins_service.BuyOrSellRequest) (*coins_service.BuyOrSellResponse, error)
 	GetBuy(ctx context.Context, req *coins_service.BuyOrSellRequest) (*coins_service.BuyOrSellResponse, error)
-}
-
-type ImagesRepoI interface {
-	FileUpload(ctx context.Context, req *coins_service.ImageData) (resp *coins_service.ImagePrimaryKey, err error)
-	FileDelete(ctx context.Context, req *coins_service.ImagePrimaryKey) (resp *coins_service.Empty, err error)
 }
 
 type HistoryUserRepoI interface {
