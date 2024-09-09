@@ -40,3 +40,14 @@ func (i *HistoryService) HistoryUser(ctx context.Context, req *coins_service.His
 	}
 	return resp, nil
 }
+
+func (i *HistoryService) HistoryUserAll(ctx context.Context, req *coins_service.Empty) (resp *coins_service.HistoryUserResponse, err error) {
+	i.log.Info("---UserHistoryAll------>", logger.Any("req", req))
+
+	resp, err = i.strg.History().HistoryUserAll(ctx)
+	if err != nil {
+		i.log.Error("!!!UserHistory->Coin->Get--->", logger.Error(err))
+		return nil, status.Error(codes.InvalidArgument, err.Error())
+	}
+	return resp, nil
+}

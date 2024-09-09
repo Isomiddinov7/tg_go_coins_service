@@ -1,9 +1,10 @@
 syntax = "proto3";
 option go_package = "genproto/coins_service";
 package coins_service;
-
+import "coin.proto";
 service HistoryService{
     rpc HistoryUser(HistoryUserRequest) returns(HistoryUserResponse){}
+    rpc HistoryUserAll(Empty) returns(HistoryUserResponse){}
 }
 
 message HistoryUserRequest{

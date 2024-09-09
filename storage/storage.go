@@ -27,4 +27,5 @@ type GetBuyOrSellRepoI interface {
 
 type HistoryUserRepoI interface {
 	HistoryUser(ctx context.Context, req *coins_service.HistoryUserRequest) (resp *coins_service.HistoryUserResponse, err error)
+	HistoryUserAll(ctx context.Context) (resp *coins_service.HistoryUserResponse, err error)
 }
