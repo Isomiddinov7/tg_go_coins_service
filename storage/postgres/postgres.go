@@ -10,10 +10,11 @@ import (
 )
 
 type Store struct {
-	db       *pgxpool.Pool
-	coin     storage.CoinRepoI
-	buy_sell storage.GetBuyOrSellRepoI
-	history  storage.HistoryUserRepoI
+	db               *pgxpool.Pool
+	coin             storage.CoinRepoI
+	buy_sell         storage.GetBuyOrSellRepoI
+	history          storage.HistoryUserRepoI
+	telegram_premium storage.TelegramPremiumRepoI
 }
 
 func NewPostgres(ctx context.Context, cfg config.Config) (storage.StorageI, error) {
@@ -75,4 +76,12 @@ func (s *Store) History() storage.HistoryUserRepoI {
 	}
 
 	return s.history
+}
+
+func (s *Store) TelegramPremium() storage.TelegramPremiumRepoI {
+	if s.telegram_premium == nil {
+		s.telegram_premium = NewTelegramPremiumRepo(s.db)
+	}
+
+	return s.telegram_premium
 }

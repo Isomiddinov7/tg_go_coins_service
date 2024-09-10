@@ -2,6 +2,7 @@ CREATE TYPE StatusUser AS ENUM('active', 'inactive');
 CREATE TYPE BuyOrSell AS ENUM('buy', 'sell');
 CREATE TYPE MessageStatus AS ENUM('user', 'admin');
 CREATE TYPE MessageReadStatus AS ENUM('false', 'true');
+CREATE TYPE TransactionStatus AS ENUM('pending', 'success', 'error');
 
 CREATE TABLE IF NOT EXISTS "telegram_user"(
     "id" UUID NOT NULL PRIMARY KEY,
@@ -70,6 +71,7 @@ CREATE TABLE IF NOT EXISTS "user_transaction"(
     "card_name" VARCHAR,
     "payment_card" VARCHAR,
     "message" TEXT,
+    "transaction_status" TransactionStatus DEFAULT 'pending',
     "created_at" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP
 );
@@ -82,6 +84,36 @@ CREATE TABLE IF NOT EXISTS "messages"(
     "admin_id" UUID NOT NULL REFERENCES "admin"("id"),
     "user_id" UUID NOT NULL REFERENCES "users"("id"), 
     "file" VARCHAR NOT NULL,
+    "created_at" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP
+);
+CREATE TABLE IF NOT EXISTS "premium"(
+    "id" UUID NOT NULL PRIMARY KEY,
+    "name" VARCHAR NOT NULL,
+    "card_number" VARCHAR NOT NULL,
+    "img" VARCHAR NOT NULL,
+    "created_at" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS "premium_price_month"(
+    "id" UUID NOT NULL PRIMARY KEY,
+    "month" VARCHAR NOT NULL,
+    "price" VARCHAR NOT NULL,
+    "premium_id" UUID NOT NULL REFERENCES "premium"("id"),
+    "created_at" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP
+);
+
+
+CREATE TABLE IF NOT EXISTS "premium_transaction"(
+    "id" UUID NOT NULL PRIMARY KEY,
+    "phone_number" VARCHAR NOT NULL,
+    "telegram_username" VARCHAR NOT NULL,
+    "premium_id" UUID NOT NULL REFERENCES "premium"("id"),
+    "user_id" UUID NOT NULL REFERENCES "users"("id"),
+    "payment_img" VARCHAR NOT NULL,
+    "transaction_status" TransactionStatus DEFAULT 'pending',
     "created_at" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP
 );

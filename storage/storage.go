@@ -10,6 +10,7 @@ type StorageI interface {
 	Coin() CoinRepoI
 	GetBuyOrSell() GetBuyOrSellRepoI
 	History() HistoryUserRepoI
+	TelegramPremium() TelegramPremiumRepoI
 }
 
 type CoinRepoI interface {
@@ -28,4 +29,13 @@ type GetBuyOrSellRepoI interface {
 type HistoryUserRepoI interface {
 	HistoryUser(ctx context.Context, req *coins_service.HistoryUserRequest) (resp *coins_service.HistoryUserResponse, err error)
 	HistoryUserAll(ctx context.Context) (resp *coins_service.HistoryUserResponse, err error)
+}
+
+type TelegramPremiumRepoI interface {
+	CreatePrice(ctx context.Context, req *coins_service.CreateTelegramPremiumPrice) (resp *coins_service.TelegramPremiumPrice, err error)
+	CreatePremium(ctx context.Context, req *coins_service.CreateTelegramPremium) (resp *coins_service.TelegramPremium, err error)
+	GetPremiumById(ctx context.Context, req *coins_service.TelegramPriemiumPrimaryKey) (resp *coins_service.TelegramPremium, err error)
+	UpdateTransactionStatus(ctx context.Context, req *coins_service.UpdateStatus) (int64, error)
+	PremiumTransaction(ctx context.Context, req *coins_service.PremiumTransactionRequest) error
+	GetList(ctx context.Context, req *coins_service.GetListPremiumRequest) (resp *coins_service.GetPremiumTransactionResponse, err error)
 }
