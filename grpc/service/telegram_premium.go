@@ -100,3 +100,15 @@ func (i *PremiumService) GetList(ctx context.Context, req *coins_service.GetList
 
 	return resp, nil
 }
+
+func (i *PremiumService) GetPremiumList(ctx context.Context, req *coins_service.GetPremiumListRequest) (resp *coins_service.GetPremiumListResponse, err error) {
+
+	i.log.Info("---GetPremiumList------>", logger.Any("req", req))
+	resp, err = i.strg.TelegramPremium().GetPremiumList(ctx, req)
+	if err != nil {
+		i.log.Error("!!!GetPremiumList->TelegramPremium->GetList--->", logger.Error(err))
+		return nil, status.Error(codes.InvalidArgument, err.Error())
+	}
+
+	return resp, nil
+}

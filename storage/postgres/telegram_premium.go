@@ -9,6 +9,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v4/pgxpool"
+	"github.com/spf13/cast"
 )
 
 type premiumRepo struct {
@@ -122,7 +123,9 @@ func (r *premiumRepo) GetPremiumById(ctx context.Context, req *coins_service.Tel
 	}
 
 	rows, err := r.db.Query(ctx, queryPrice, req.Id)
-
+	if err != nil {
+		return nil, err
+	}
 	for rows.Next() {
 		var (
 			data     coins_service.TelegramPremiumPrice
@@ -136,6 +139,10 @@ func (r *premiumRepo) GetPremiumById(ctx context.Context, req *coins_service.Tel
 			&month,
 			&price,
 		)
+		if err != nil {
+			return nil, err
+		}
+
 		data = coins_service.TelegramPremiumPrice{
 			Id:    price.String,
 			Month: month.String,
@@ -228,6 +235,7 @@ func (r *premiumRepo) GetList(ctx context.Context, req *coins_service.GetListPre
 			SELECT
 				COUNT(*) OVER(),
 				pt."telegram_username",
+				pt."phone_number",
 				pm."name",
 				pm."month",
 				u."first_name",
@@ -281,5 +289,117 @@ func (r *premiumRepo) GetList(ctx context.Context, req *coins_service.GetListPre
 
 		resp.Transactions = append(resp.Transactions, &data)
 	}
+	return &resp, nil
+}
+
+func (r *premiumRepo) GetPremiumList(ctx context.Context, req *coins_service.GetPremiumListRequest) (*coins_service.GetPremiumListResponse, error) {
+	var (
+		resp   coins_service.GetPremiumListResponse
+		where  = " WHERE TRUE"
+		offset = " OFFSET 0"
+		limit  = " LIMIT 10"
+		sort   = " ORDER BY created_at DESC"
+	)
+
+	if req.Offset > 0 {
+		offset = fmt.Sprintf(" OFFSET %d", req.Offset)
+	}
+
+	if req.Limit > 0 {
+		limit = fmt.Sprintf(" LIMIT %d", req.Limit)
+	}
+
+	var (
+		query = `
+			SELECT
+				COUNT(*) OVER(),
+				"id",
+				"name",
+				"card_name",
+				"img",
+				"created_at",
+				"updated_at"
+			FROM "premium" as p
+		`
+		queryPrice = `
+			SELECT 
+				"id",
+				"month",
+				"price"
+			FROM "premium_price_month"
+			WHERE premium_id = $1
+		`
+	)
+	query += where + sort + offset + limit
+
+	rows, err := r.db.Query(ctx, query)
+	if err != nil {
+		return nil, err
+	}
+
+	for rows.Next() {
+		var (
+			data       coins_service.TelegramPremium
+			prices     []*coins_service.TelegramPremiumPrice
+			id         sql.NullString
+			name       sql.NullString
+			card_name  sql.NullString
+			img        sql.NullString
+			created_at sql.NullString
+			updated_at sql.NullString
+		)
+
+		err = rows.Scan(
+			resp.Count,
+			&id,
+			&name,
+			&card_name,
+			&img,
+			&created_at,
+			&updated_at,
+		)
+		if err != nil {
+			return nil, err
+		}
+
+		rowsPrice, err := r.db.Query(ctx, queryPrice, cast.ToString(id))
+		if err != nil {
+			return nil, err
+		}
+
+		for rowsPrice.Next() {
+			var (
+				price_id sql.NullString
+				month    sql.NullString
+				price    sql.NullString
+			)
+
+			err = rowsPrice.Scan(
+				&price_id,
+				&month,
+				&price,
+			)
+			if err != nil {
+				return nil, err
+			}
+
+			prices = append(prices, &coins_service.TelegramPremiumPrice{
+				Id:    price_id.String,
+				Month: month.String,
+				Price: price.String,
+			})
+		}
+		data = coins_service.TelegramPremium{
+			Id:         id.String,
+			Name:       name.String,
+			CardNumber: card_name.String,
+			Img:        img.String,
+			Price:      prices,
+			CreatedAt:  created_at.String,
+			UpdatedAt:  updated_at.String,
+		}
+		resp.TelegramPremium = append(resp.TelegramPremium, &data)
+	}
+
 	return &resp, nil
 }

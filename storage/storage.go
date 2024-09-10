@@ -38,4 +38,5 @@ type TelegramPremiumRepoI interface {
 	UpdateTransactionStatus(ctx context.Context, req *coins_service.UpdateStatus) (int64, error)
 	PremiumTransaction(ctx context.Context, req *coins_service.PremiumTransactionRequest) error
 	GetList(ctx context.Context, req *coins_service.GetListPremiumRequest) (resp *coins_service.GetPremiumTransactionResponse, err error)
+	GetPremiumList(ctx context.Context, req *coins_service.GetPremiumListRequest) (resp *coins_service.GetPremiumListResponse, err error)
 }
