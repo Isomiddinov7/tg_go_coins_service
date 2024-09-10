@@ -87,6 +87,7 @@ CREATE TABLE IF NOT EXISTS "messages"(
     "created_at" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP
 );
+
 CREATE TABLE IF NOT EXISTS "premium"(
     "id" UUID NOT NULL PRIMARY KEY,
     "name" VARCHAR NOT NULL,
