@@ -111,10 +111,40 @@ CREATE TABLE IF NOT EXISTS "premium_transaction"(
     "id" UUID NOT NULL PRIMARY KEY,
     "phone_number" VARCHAR NOT NULL,
     "telegram_username" VARCHAR NOT NULL,
-    "premium_id" UUID NOT NULL REFERENCES "premium"("id"),
     "user_id" UUID NOT NULL REFERENCES "users"("id"),
+    "price_id" UUID NOT NULL REFERENCES "premium_price_month"("id"),
     "payment_img" VARCHAR NOT NULL,
     "transaction_status" TransactionStatus DEFAULT 'pending',
+    "created_at" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS "stars"(
+    "id" UUID NOT NULL PRIMARY KEY,
+    "name" VARCHAR NOT NULL,
+    "count" VARCHAR NOT NULL,
+    "price" VARCHAR NOT NULL,
+    "created_at" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS "starts_img"(
+    "id" UUID NOT NULL PRIMARY KEY,
+    "stars_img" VARCHAR NOT NULL,
+    "stars_id" NOT NULL REFERENCES "stars"("id"),
+    "created_at" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP
+)
+
+CREATE TABLE IF NOT EXISTS "stars_transaction"(
+    "id" UUID NOT NULL PRIMARY KEY,
+    "stars_id" NOT NULL REFERENCES "stars"("id"),
+    "transfer_img" VARCHAR NOT NULL,
+    "stars_count" VARCHAR NOT NULL,
+    "stars_price" VARCHAR NOT NULL,
+    "user_name" VARCHAR NOT NULL,
+    "telegram_id" VARCHAR NOT NULL,
+    "status" TransactionStatus DEFAULT 'pending',
     "created_at" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP
 );

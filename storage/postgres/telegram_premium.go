@@ -235,15 +235,15 @@ func (r *premiumRepo) GetList(ctx context.Context, req *coins_service.GetListPre
 				COUNT(*) OVER(),
 				pt."telegram_username",
 				pt."phone_number",
-				pm."name",
+				p."name",
 				pm."month",
 				u."first_name",
 				pt."created_at",
 				pt."updated_at"
 			FROM "premium_transaction" as pt
-			JOIN "premium" as p ON p."id" = pt."premium_id"
+			JOIN "premium_price_month" as pm ON pm."id"= pt."price_id"
+			JOIN "premium" as p ON p."id" = pm."premium_id"
 			JOIN "users" as u ON u."id" = pt."user_id"
-			JOIN "premium_price_month" as pm ON pm."premium_id"= p."id"
 		`
 	)
 	query += where + sort + offset + limit
@@ -311,13 +311,13 @@ func (r *premiumRepo) GetPremiumList(ctx context.Context, req *coins_service.Get
 	var (
 		query = `
 			SELECT
-				COUNT(p.*) OVER(),
-				p."id",
-				p."name",
-				p."img",
-				p"created_at",
-				p."updated_at"
-			FROM "premium" as p
+				COUNT(*) OVER(),
+				"id",
+				"name",
+				"img",
+				"created_at",
+				"updated_at"
+			FROM "premium"
 		`
 		queryPrice = `
 			SELECT 
@@ -336,13 +336,13 @@ func (r *premiumRepo) GetPremiumList(ctx context.Context, req *coins_service.Get
 	}
 
 	defer rows.Close()
+
 	for rows.Next() {
 		var (
 			data       coins_service.TelegramPremium
 			prices     []*coins_service.TelegramPremiumPrice
 			id         sql.NullString
 			name       sql.NullString
-			card_name  sql.NullString
 			img        sql.NullString
 			created_at sql.NullString
 			updated_at sql.NullString
@@ -389,17 +389,16 @@ func (r *premiumRepo) GetPremiumList(ctx context.Context, req *coins_service.Get
 		}
 		defer rowsPrice.Close()
 		data = coins_service.TelegramPremium{
-			Id:         id.String,
-			Name:       name.String,
-			CardNumber: card_name.String,
-			Img:        img.String,
-			Price:      prices,
-			CreatedAt:  created_at.String,
-			UpdatedAt:  updated_at.String,
+			Id:        id.String,
+			Name:      name.String,
+			Img:       img.String,
+			Price:     prices,
+			CreatedAt: created_at.String,
+			UpdatedAt: updated_at.String,
 		}
 		resp.TelegramPremium = append(resp.TelegramPremium, &data)
-		fmt.Println(&resp)
 	}
 
 	return &resp, nil
+
 }
