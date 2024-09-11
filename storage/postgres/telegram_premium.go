@@ -9,7 +9,6 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v4/pgxpool"
-	"github.com/spf13/cast"
 )
 
 type premiumRepo struct {
@@ -84,7 +83,7 @@ func (r *premiumRepo) GetPremiumById(ctx context.Context, req *coins_service.Tel
 			SELECT
 				"id",
 				"name",
-				"card_name",
+				"card_number",
 				"img",
 				"created_at",
 				"updated_at"
@@ -312,13 +311,12 @@ func (r *premiumRepo) GetPremiumList(ctx context.Context, req *coins_service.Get
 	var (
 		query = `
 			SELECT
-				COUNT(*) OVER(),
-				"id",
-				"name",
-				"card_name",
-				"img",
-				"created_at",
-				"updated_at"
+				COUNT(p.*) OVER(),
+				p."id",
+				p."name",
+				p."img",
+				p"created_at",
+				p."updated_at"
 			FROM "premium" as p
 		`
 		queryPrice = `
@@ -337,6 +335,7 @@ func (r *premiumRepo) GetPremiumList(ctx context.Context, req *coins_service.Get
 		return nil, err
 	}
 
+	defer rows.Close()
 	for rows.Next() {
 		var (
 			data       coins_service.TelegramPremium
@@ -350,10 +349,9 @@ func (r *premiumRepo) GetPremiumList(ctx context.Context, req *coins_service.Get
 		)
 
 		err = rows.Scan(
-			resp.Count,
+			&resp.Count,
 			&id,
 			&name,
-			&card_name,
 			&img,
 			&created_at,
 			&updated_at,
@@ -362,7 +360,7 @@ func (r *premiumRepo) GetPremiumList(ctx context.Context, req *coins_service.Get
 			return nil, err
 		}
 
-		rowsPrice, err := r.db.Query(ctx, queryPrice, cast.ToString(id))
+		rowsPrice, err := r.db.Query(ctx, queryPrice, id.String)
 		if err != nil {
 			return nil, err
 		}
@@ -389,6 +387,7 @@ func (r *premiumRepo) GetPremiumList(ctx context.Context, req *coins_service.Get
 				Price: price.String,
 			})
 		}
+		defer rowsPrice.Close()
 		data = coins_service.TelegramPremium{
 			Id:         id.String,
 			Name:       name.String,
@@ -399,6 +398,7 @@ func (r *premiumRepo) GetPremiumList(ctx context.Context, req *coins_service.Get
 			UpdatedAt:  updated_at.String,
 		}
 		resp.TelegramPremium = append(resp.TelegramPremium, &data)
+		fmt.Println(&resp)
 	}
 
 	return &resp, nil
