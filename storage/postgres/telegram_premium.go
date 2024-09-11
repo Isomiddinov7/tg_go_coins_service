@@ -181,6 +181,7 @@ func (r *premiumRepo) UpdateTransactionStatus(ctx context.Context, req *coins_se
 }
 
 func (r *premiumRepo) PremiumTransaction(ctx context.Context, req *coins_service.PremiumTransactionRequest) error {
+	fmt.Println(req)
 	var (
 		query = `
 			INSERT INTO "premium_transaction"(
@@ -257,6 +258,7 @@ func (r *premiumRepo) GetList(ctx context.Context, req *coins_service.GetListPre
 		var (
 			data              coins_service.GetPremiumTransaction
 			telegram_username sql.NullString
+			phone_number      sql.NullString
 			name              sql.NullString
 			month             sql.NullString
 			first_name        sql.NullString
@@ -267,6 +269,7 @@ func (r *premiumRepo) GetList(ctx context.Context, req *coins_service.GetListPre
 		err = rows.Scan(
 			resp.Count,
 			&telegram_username,
+			&phone_number,
 			&name,
 			&month,
 			&first_name,
@@ -278,12 +281,13 @@ func (r *premiumRepo) GetList(ctx context.Context, req *coins_service.GetListPre
 		}
 
 		data = coins_service.GetPremiumTransaction{
-			UserName:  telegram_username.String,
-			Name:      name.String,
-			Month:     month.String,
-			FirstName: first_name.String,
-			CreatedAt: created_at.String,
-			UpdatedAt: updated_at.String,
+			UserName:    telegram_username.String,
+			Name:        name.String,
+			Month:       month.String,
+			FirstName:   first_name.String,
+			PhoneNumber: phone_number.String,
+			CreatedAt:   created_at.String,
+			UpdatedAt:   updated_at.String,
 		}
 
 		resp.Transactions = append(resp.Transactions, &data)
