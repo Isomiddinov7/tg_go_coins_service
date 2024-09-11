@@ -143,7 +143,7 @@ func (r *premiumRepo) GetPremiumById(ctx context.Context, req *coins_service.Tel
 		}
 
 		data = coins_service.TelegramPremiumPrice{
-			Id:    price.String,
+			Id:    price_id.String,
 			Month: month.String,
 			Price: price.String,
 		}
