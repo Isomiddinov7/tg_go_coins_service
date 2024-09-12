@@ -254,6 +254,8 @@ func (r *premiumRepo) GetList(ctx context.Context, req *coins_service.GetListPre
 		return nil, err
 	}
 
+	defer rows.Close()
+
 	for rows.Next() {
 		var (
 			data              coins_service.GetPremiumTransaction
@@ -267,7 +269,7 @@ func (r *premiumRepo) GetList(ctx context.Context, req *coins_service.GetListPre
 		)
 
 		err = rows.Scan(
-			resp.Count,
+			&resp.Count,
 			&telegram_username,
 			&phone_number,
 			&name,
