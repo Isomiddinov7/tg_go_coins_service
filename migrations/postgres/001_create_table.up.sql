@@ -4,13 +4,6 @@ CREATE TYPE MessageStatus AS ENUM('user', 'admin');
 CREATE TYPE MessageReadStatus AS ENUM('false', 'true');
 CREATE TYPE TransactionStatus AS ENUM('pending', 'success', 'error');
 
-CREATE TABLE IF NOT EXISTS "telegram_user"(
-    "id" UUID NOT NULL PRIMARY KEY,
-    "first_name" VARCHAR NOT NULL,
-    "telegram_id" VARCHAR NOT NULL
-);
-
-
 CREATE TABLE IF NOT EXISTS "coins"(
     "id" UUID NOT NULL PRIMARY KEY,
     "name" VARCHAR NOT NULL,
@@ -36,7 +29,7 @@ CREATE TABLE IF NOT EXISTS "users"(
     "last_name" VARCHAR,
     "username" VARCHAR,
     "status" StatusUser DEFAULT 'active',
-    "telegram_id" VARCHAR NOT NULL,
+    "telegram_id" VARCHAR UNIQUE NOT NULL,
     "created_at" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP
 );
@@ -76,6 +69,9 @@ CREATE TABLE IF NOT EXISTS "user_transaction"(
     "updated_at" TIMESTAMP
 );
 
+
+-- ALTER TABLE user_transaction
+-- ADD transaction_status TransactionStatus DEFAULT 'pending';
 CREATE TABLE IF NOT EXISTS "messages"(
     "id" UUID NOT NULL PRIMARY KEY,
     "status" MessageStatus NOT NULL,
@@ -84,6 +80,17 @@ CREATE TABLE IF NOT EXISTS "messages"(
     "admin_id" UUID NOT NULL REFERENCES "admin"("id"),
     "user_id" UUID NOT NULL REFERENCES "users"("id"), 
     "file" VARCHAR NOT NULL,
+    "created_at" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS "pay_message"(
+    "id" UUID NOT NULL PRIMARY KEY,
+    "message" TEXT NOT NULL,
+    "file" VARCHAR NOT NULL,
+    "user_transaction_id" UUID,
+    "premium_transaction_id" UUID,
+    "user_id" UUID NOT NULL REFERENCES "users"("id"), 
     "created_at" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP
 );
@@ -106,73 +113,25 @@ CREATE TABLE IF NOT EXISTS "premium_price_month"(
     "updated_at" TIMESTAMP
 );
 
-
 CREATE TABLE IF NOT EXISTS "premium_transaction"(
     "id" UUID NOT NULL PRIMARY KEY,
     "phone_number" VARCHAR NOT NULL,
     "telegram_username" VARCHAR NOT NULL,
+    "premium_id" UUID NOT NULL REFERENCES "premium"("id"),
     "user_id" UUID NOT NULL REFERENCES "users"("id"),
-    "price_id" UUID NOT NULL REFERENCES "premium_price_month"("id"),
     "payment_img" VARCHAR NOT NULL,
     "transaction_status" TransactionStatus DEFAULT 'pending',
     "created_at" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP
 );
 
-CREATE TABLE IF NOT EXISTS "stars"(
-    "id" UUID NOT NULL PRIMARY KEY,
-    "name" VARCHAR NOT NULL,
-    "count" VARCHAR NOT NULL,
-    "price" VARCHAR NOT NULL,
-    "created_at" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    "updated_at" TIMESTAMP
-);
-
-CREATE TABLE IF NOT EXISTS "starts_img"(
-    "id" UUID NOT NULL PRIMARY KEY,
-    "stars_img" VARCHAR NOT NULL,
-    "stars_id" NOT NULL REFERENCES "stars"("id"),
-    "created_at" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    "updated_at" TIMESTAMP
-)
-
-CREATE TABLE IF NOT EXISTS "stars_transaction"(
-    "id" UUID NOT NULL PRIMARY KEY,
-    "stars_id" NOT NULL REFERENCES "stars"("id"),
-    "transfer_img" VARCHAR NOT NULL,
-    "stars_count" VARCHAR NOT NULL,
-    "stars_price" VARCHAR NOT NULL,
-    "user_name" VARCHAR NOT NULL,
-    "telegram_id" VARCHAR NOT NULL,
-    "status" TransactionStatus DEFAULT 'pending',
-    "created_at" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    "updated_at" TIMESTAMP
-);
-
--- INSERT INTO "admin"("id", "login", "password") VALUES('dbecf401-64b3-4b9b-829a-c8b061431286', 'bahodir2809', '123456789');
+-- INSERT INTO "admin"("id", "login", "password") VALUES('dbecf401-64b3-4b9b-829a-c8b061431286', 'Sayusupov1972', 'sayusupov1972');
 -- INSERT INTO "super_admin"("id","login","password") VALUES('690d15b1-b3bf-416f-83e1-02b183ccb2f2', 'azam1222', '938791222');
 -- INSERT INTO "admin_address"("admin_id", "coin_id", "address") VALUES('dbecf401-64b3-4b9b-829a-c8b061431286', 'ecd98c25-4cd3-41f7-8526-5efe021533f7', 'addres$$TON');
 -- [
 --       {"HalfCoinAmount": "0.5", "HalfCoinPrice": "650000"},
 --       {"HalfCoinAmount": "0.8", "HalfCoinPrice": "80000"}
 -- ]
--- CREATE TABLE IF NOT EXISTS "sell_coin"(
---     "user_id" UUID NOT NULL REFERENCES "users"("id"),
---     "coin_id" UUID NOT NULL REFERENCES "coins"("id"),
---     "address" VARCHAR NOT NULL,
---     "coin_amount" VARCHAR NOT NULL,
---     "number_of_card" VARCHAR NOT NULL,
---     "check_img" TEXT,
---     "price" VARCHAR NOT NULL,
---     "created_at" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
---     "updated_at" TIMESTAMP
--- );
-
-
-    -- login password 
-    --     success
-    --     accsess token
-        
 
 
 
