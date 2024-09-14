@@ -25,7 +25,7 @@ func (r *historyRepo) HistoryUser(ctx context.Context, req *coins_service.Histor
 		query = `
 			SELECT 
 				ut.id,
-				c.name
+				c.name,
 				ut.status,
 				ut.user_confirmation_img,
 				ut.coin_amount,
@@ -34,7 +34,7 @@ func (r *historyRepo) HistoryUser(ctx context.Context, req *coins_service.Histor
 				ut.user_address,
 				ut.payment_card,
 				ut.created_at
-			FROM "user_transaction"
+			FROM "user_transaction" as ut
 			JOIN "coins" as c ON c.id = ut.coin_id
 			WHERE user_id = $1
 		`
