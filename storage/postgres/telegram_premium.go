@@ -181,7 +181,6 @@ func (r *premiumRepo) UpdateTransactionStatus(ctx context.Context, req *coins_se
 }
 
 func (r *premiumRepo) PremiumTransaction(ctx context.Context, req *coins_service.PremiumTransactionRequest) error {
-	fmt.Println(req)
 	var (
 		query = `
 			INSERT INTO "premium_transaction"(
@@ -299,6 +298,66 @@ func (r *premiumRepo) GetList(ctx context.Context, req *coins_service.GetListPre
 		resp.Transactions = append(resp.Transactions, &data)
 	}
 	return &resp, nil
+}
+
+func (r *premiumRepo) GetPremiumTransactionById(ctx context.Context, req *coins_service.GetPremiumTransactionPrimaryKey) (resp *coins_service.GetPremiumTransactionId, err error) {
+
+	var (
+		query = `
+			SELECT
+				pt."id",
+				pt."telegram_username",
+				pt."phone_number",
+				p."name",
+				pm."month",
+				pt."payment_img",
+				u."first_name",
+				pt."created_at",
+				pt."updated_at"
+			FROM "premium_transaction" as pt
+			JOIN "premium_price_month" as pm ON pm."id"= pt."price_id"
+			JOIN "premium" as p ON p."id" = pm."premium_id"
+			JOIN "users" as u ON u."id" = pt."user_id"
+			WHERE pt."id" = $1
+		`
+
+		id                sql.NullString
+		telegram_username sql.NullString
+		phone_number      sql.NullString
+		name              sql.NullString
+		month             sql.NullString
+		payment_img       sql.NullString
+		first_name        sql.NullString
+		created_at        sql.NullString
+		updated_at        sql.NullString
+	)
+
+	err = r.db.QueryRow(ctx, query, req.PremiumTransactionId).Scan(
+		&id,
+		&telegram_username,
+		&phone_number,
+		&name,
+		&month,
+		&payment_img,
+		&first_name,
+		&created_at,
+		&updated_at,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	return &coins_service.GetPremiumTransactionId{
+		Id:          id.String,
+		UserName:    telegram_username.String,
+		PhoneNumber: phone_number.String,
+		Name:        name.String,
+		Month:       month.String,
+		PaymentImg:  payment_img.String,
+		FirstName:   first_name.String,
+		CreatedAt:   created_at.String,
+		UpdatedAt:   updated_at.String,
+	}, nil
 }
 
 func (r *premiumRepo) GetPremiumList(ctx context.Context, req *coins_service.GetPremiumListRequest) (*coins_service.GetPremiumListResponse, error) {

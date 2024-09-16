@@ -112,3 +112,13 @@ func (i *PremiumService) GetPremiumList(ctx context.Context, req *coins_service.
 
 	return resp, nil
 }
+
+func (i *NFTService) GetPremiumTransactionById(ctx context.Context, req *coins_service.GetPremiumTransactionPrimaryKey) (resp *coins_service.GetPremiumTransactionId, err error) {
+	i.log.Info("---GetPremiumTransactionById------>", logger.Any("req", req))
+	resp, err = i.strg.TelegramPremium().GetPremiumTransactionById(ctx, req)
+	if err != nil {
+		i.log.Error("!!!GetPremiumTransactionById->TelegramPremium->Get--->", logger.Error(err))
+		return nil, status.Error(codes.InvalidArgument, err.Error())
+	}
+	return resp, nil
+}

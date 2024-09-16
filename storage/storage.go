@@ -40,11 +40,12 @@ type TelegramPremiumRepoI interface {
 	PremiumTransaction(ctx context.Context, req *coins_service.PremiumTransactionRequest) error
 	GetList(ctx context.Context, req *coins_service.GetListPremiumRequest) (resp *coins_service.GetPremiumTransactionResponse, err error)
 	GetPremiumList(ctx context.Context, req *coins_service.GetPremiumListRequest) (resp *coins_service.GetPremiumListResponse, err error)
+	GetPremiumTransactionById(ctx context.Context, req *coins_service.GetPremiumTransactionPrimaryKey) (resp *coins_service.GetPremiumTransactionId, err error)
 }
 
 type NFTRepoI interface {
 	Create(ctx context.Context, req *coins_service.CreateNFT) (resp *coins_service.NFT, err error)
 	GetById(ctx context.Context, req *coins_service.NFTPrimaryKey) (resp *coins_service.NFT, err error)
 	GetAll(ctx context.Context, req *coins_service.GetListNFTRequest) (resp *coins_service.GetListNFTResponse, err error)
-	Update(ctx context.Context, req *coins_service.UpdateNFT) (rowsAffected int64,err error)
+	Update(ctx context.Context, req *coins_service.UpdateNFT) (rowsAffected int64, err error)
 }
