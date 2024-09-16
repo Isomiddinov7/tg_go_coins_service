@@ -234,6 +234,7 @@ func (r *premiumRepo) GetList(ctx context.Context, req *coins_service.GetListPre
 		query = `
 			SELECT
 				COUNT(*) OVER(),
+				pt."id",
 				pt."telegram_username",
 				pt."phone_number",
 				p."name",
@@ -259,6 +260,7 @@ func (r *premiumRepo) GetList(ctx context.Context, req *coins_service.GetListPre
 	for rows.Next() {
 		var (
 			data              coins_service.GetPremiumTransaction
+			id                sql.NullString
 			telegram_username sql.NullString
 			phone_number      sql.NullString
 			name              sql.NullString
@@ -270,6 +272,7 @@ func (r *premiumRepo) GetList(ctx context.Context, req *coins_service.GetListPre
 
 		err = rows.Scan(
 			&resp.Count,
+			&id,
 			&telegram_username,
 			&phone_number,
 			&name,
@@ -283,6 +286,7 @@ func (r *premiumRepo) GetList(ctx context.Context, req *coins_service.GetListPre
 		}
 
 		data = coins_service.GetPremiumTransaction{
+			Id:          id.String,
 			UserName:    telegram_username.String,
 			Name:        name.String,
 			Month:       month.String,
