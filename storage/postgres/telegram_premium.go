@@ -316,6 +316,7 @@ func (r *premiumRepo) GetPremiumTransactionById(ctx context.Context, req *coins_
 				pm."month",
 				pt."transaction_status",
 				pt."payment_img",
+				pt."user_id",
 				u."first_name",
 				pt."created_at",
 				pt."updated_at"
@@ -333,6 +334,7 @@ func (r *premiumRepo) GetPremiumTransactionById(ctx context.Context, req *coins_
 		month              sql.NullString
 		transaction_status sql.NullString
 		payment_img        sql.NullString
+		user_id            sql.NullString
 		first_name         sql.NullString
 		created_at         sql.NullString
 		updated_at         sql.NullString
@@ -346,6 +348,7 @@ func (r *premiumRepo) GetPremiumTransactionById(ctx context.Context, req *coins_
 		&month,
 		&transaction_status,
 		&payment_img,
+		&user_id,
 		&first_name,
 		&created_at,
 		&updated_at,
@@ -362,6 +365,7 @@ func (r *premiumRepo) GetPremiumTransactionById(ctx context.Context, req *coins_
 		Month:       month.String,
 		Status:      transaction_status.String,
 		PaymentImg:  payment_img.String,
+		UserId:      user_id.String,
 		FirstName:   first_name.String,
 		CreatedAt:   created_at.String,
 		UpdatedAt:   updated_at.String,
