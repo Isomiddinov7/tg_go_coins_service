@@ -238,6 +238,7 @@ func (r *premiumRepo) GetList(ctx context.Context, req *coins_service.GetListPre
 				pt."phone_number",
 				p."name",
 				pm."month",
+				pt."transaction_status",
 				u."first_name",
 				pt."created_at",
 				pt."updated_at"
@@ -258,15 +259,16 @@ func (r *premiumRepo) GetList(ctx context.Context, req *coins_service.GetListPre
 
 	for rows.Next() {
 		var (
-			data              coins_service.GetPremiumTransaction
-			id                sql.NullString
-			telegram_username sql.NullString
-			phone_number      sql.NullString
-			name              sql.NullString
-			month             sql.NullString
-			first_name        sql.NullString
-			created_at        sql.NullString
-			updated_at        sql.NullString
+			data               coins_service.GetPremiumTransaction
+			id                 sql.NullString
+			telegram_username  sql.NullString
+			phone_number       sql.NullString
+			name               sql.NullString
+			month              sql.NullString
+			transaction_status sql.NullString
+			first_name         sql.NullString
+			created_at         sql.NullString
+			updated_at         sql.NullString
 		)
 
 		err = rows.Scan(
@@ -276,6 +278,7 @@ func (r *premiumRepo) GetList(ctx context.Context, req *coins_service.GetListPre
 			&phone_number,
 			&name,
 			&month,
+			&transaction_status,
 			&first_name,
 			&created_at,
 			&updated_at,
@@ -289,6 +292,7 @@ func (r *premiumRepo) GetList(ctx context.Context, req *coins_service.GetListPre
 			UserName:    telegram_username.String,
 			Name:        name.String,
 			Month:       month.String,
+			Status:      transaction_status.String,
 			FirstName:   first_name.String,
 			PhoneNumber: phone_number.String,
 			CreatedAt:   created_at.String,
@@ -310,6 +314,7 @@ func (r *premiumRepo) GetPremiumTransactionById(ctx context.Context, req *coins_
 				pt."phone_number",
 				p."name",
 				pm."month",
+				pt."transaction_status",
 				pt."payment_img",
 				u."first_name",
 				pt."created_at",
@@ -321,15 +326,16 @@ func (r *premiumRepo) GetPremiumTransactionById(ctx context.Context, req *coins_
 			WHERE pt."id" = $1
 		`
 
-		id                sql.NullString
-		telegram_username sql.NullString
-		phone_number      sql.NullString
-		name              sql.NullString
-		month             sql.NullString
-		payment_img       sql.NullString
-		first_name        sql.NullString
-		created_at        sql.NullString
-		updated_at        sql.NullString
+		id                 sql.NullString
+		telegram_username  sql.NullString
+		phone_number       sql.NullString
+		name               sql.NullString
+		month              sql.NullString
+		transaction_status sql.NullString
+		payment_img        sql.NullString
+		first_name         sql.NullString
+		created_at         sql.NullString
+		updated_at         sql.NullString
 	)
 
 	err = r.db.QueryRow(ctx, query, req.PremiumTransactionId).Scan(
@@ -338,6 +344,7 @@ func (r *premiumRepo) GetPremiumTransactionById(ctx context.Context, req *coins_
 		&phone_number,
 		&name,
 		&month,
+		&transaction_status,
 		&payment_img,
 		&first_name,
 		&created_at,
@@ -353,6 +360,7 @@ func (r *premiumRepo) GetPremiumTransactionById(ctx context.Context, req *coins_
 		PhoneNumber: phone_number.String,
 		Name:        name.String,
 		Month:       month.String,
+		Status:      transaction_status.String,
 		PaymentImg:  payment_img.String,
 		FirstName:   first_name.String,
 		CreatedAt:   created_at.String,
