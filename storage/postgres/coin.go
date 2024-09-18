@@ -80,9 +80,7 @@ func (r *coinRepo) Create(ctx context.Context, req *coins_service.CreateCoin) (r
 
 	}
 
-	return &coins_service.CoinPrimaryKey{
-		Id: id,
-	}, nil
+	return resp, nil
 }
 
 func (r *coinRepo) GetByID(ctx context.Context, req *coins_service.CoinPrimaryKey) (*coins_service.Coin, error) {

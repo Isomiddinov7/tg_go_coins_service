@@ -16,6 +16,7 @@ type Store struct {
 	history          storage.HistoryUserRepoI
 	telegram_premium storage.TelegramPremiumRepoI
 	nft              storage.NFTRepoI
+	coinNft          storage.CoinNFTRepoI
 }
 
 func NewPostgres(ctx context.Context, cfg config.Config) (storage.StorageI, error) {
@@ -93,4 +94,12 @@ func (s *Store) NFT() storage.NFTRepoI {
 	}
 
 	return s.nft
+}
+
+func (s *Store) CoinNFT() storage.CoinNFTRepoI {
+	if s.coinNft == nil {
+		s.coinNft = NewCoinNftRepo(s.db)
+	}
+
+	return s.coinNft
 }

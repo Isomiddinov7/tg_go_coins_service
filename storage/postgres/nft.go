@@ -24,21 +24,28 @@ func NewNFTRepo(db *pgxpool.Pool) storage.NFTRepoI {
 func (r *nftRepo) Create(ctx context.Context, req *coins_service.CreateNFT) (resp *coins_service.NFT, err error) {
 	var (
 		nft_id = uuid.NewString()
-		query  = ` INSERT INTO "nft"(
-			"id",
-			"nft_img",
-			"comment",
-			"user_id",
-			"telegram_id"
-		) VALUES($1, $2, $3, $4, $5)`
+		query  = ` 
+		INSERT INTO "nft"(
+				"id",
+				"coin_nft_id",
+				"nft_img",
+				"comment",
+				"user_id",
+				"telegram_id",
+				"card_number",
+				"card_number_name"
+		) VALUES($1, $2, $3, $4, $5, $6, $7, $8)`
 	)
 
 	_, err = r.db.Exec(ctx, query,
 		nft_id,
+		req.CoinNftId,
 		req.NftImg,
 		req.Comment,
 		req.UserId,
 		req.TelegramId,
+		req.CardNumber,
+		req.CardNumberName,
 	)
 	if err != nil {
 		return nil, err
@@ -50,26 +57,40 @@ func (r *nftRepo) GetById(ctx context.Context, req *coins_service.NFTPrimaryKey)
 	var (
 		query = `
 			SELECT 
-				"id",
-				"nft_img",
-				"comment",
-				"user_id",
-				"status",
-				"telegram_id",
-				"created_at",
-				"updated_at"
-			FROM "nft"
+				n."id",
+				n."nft_img",
+				n."comment",
+				n."user_id",
+				n."status",
+				n."telegram_id",
+				u."first_name",
+				u."last_name",
+				u."username",
+				n."card_number",
+				n."card_number_name",
+				cn."nft_img",
+				n."created_at",
+				n."updated_at"
+			FROM "nft" as n
+			JOIN "users" as u ON n."user_id"=u."id"
+			JOIN "coin_nft" as cn ON cn."id"=n."coin_nft_id"
 			WHERE "id" = $1
 		`
 
-		id          sql.NullString
-		nft_img     sql.NullString
-		comment     sql.NullString
-		user_id     sql.NullString
-		status      sql.NullString
-		telegram_id sql.NullString
-		created_at  sql.NullString
-		updated_at  sql.NullString
+		id               sql.NullString
+		nft_img          sql.NullString
+		comment          sql.NullString
+		user_id          sql.NullString
+		status           sql.NullString
+		telegram_id      sql.NullString
+		first_name       sql.NullString
+		last_name        sql.NullString
+		username         sql.NullString
+		card_number      sql.NullString
+		card_number_name sql.NullString
+		coin_nft_img     sql.NullString
+		created_at       sql.NullString
+		updated_at       sql.NullString
 	)
 
 	err := r.db.QueryRow(ctx, query, req.Id).Scan(
@@ -79,6 +100,12 @@ func (r *nftRepo) GetById(ctx context.Context, req *coins_service.NFTPrimaryKey)
 		&user_id,
 		&status,
 		&telegram_id,
+		&first_name.String,
+		&last_name,
+		&username,
+		&card_number,
+		&card_number_name,
+		&coin_nft_img,
 		&created_at,
 		&updated_at,
 	)
@@ -87,14 +114,19 @@ func (r *nftRepo) GetById(ctx context.Context, req *coins_service.NFTPrimaryKey)
 	}
 
 	return &coins_service.NFT{
-		Id:         id.String,
-		NftImg:     nft_img.String,
-		Comment:    comment.String,
-		UserId:     user_id.String,
-		Status:     status.String,
-		TelegramId: telegram_id.String,
-		CreatedAt:  created_at.String,
-		UpdatedAt:  updated_at.String,
+		Id:             id.String,
+		NftImg:         nft_img.String,
+		Comment:        comment.String,
+		UserId:         user_id.String,
+		Status:         status.String,
+		TelegramId:     telegram_id.String,
+		FirstName:      first_name.String,
+		LastName:       last_name.String,
+		UserName:       username.String,
+		CardNamber:     card_number_name.String,
+		CardNumberName: card_number_name.String,
+		CreatedAt:      created_at.String,
+		UpdatedAt:      updated_at.String,
 	}, nil
 
 }
@@ -118,16 +150,24 @@ func (r *nftRepo) GetAll(ctx context.Context, req *coins_service.GetListNFTReque
 
 	query := `
 		SELECT
-			COUNT(*) OVER(),
-			"id",
-			"nft_img",
-			"comment",
-			"user_id",
-			"status",
-			"telegram_id",
-			"created_at",
-			"updated_at"
-		FROM "nft"
+			COUNT(n.*) OVER(),
+			n."id",
+			n."nft_img",
+			n."comment",
+			n."user_id",
+			n."status",
+			n."telegram_id",
+			u."first_name",
+			u."last_name",
+			u."username",
+			n."card_number",
+			n."card_number_name",
+			cn."nft_img",
+			n."created_at",
+			n."updated_at"
+		FROM "nft" as n
+		JOIN "users" as u ON n."user_id"=u."id"
+		JOIN "coin_nft" as cn ON cn."id"=n."coin_nft_id"
 		`
 
 	query += where + sort + offset + limit
@@ -140,15 +180,21 @@ func (r *nftRepo) GetAll(ctx context.Context, req *coins_service.GetListNFTReque
 
 	for rowsNFT.Next() {
 		var (
-			nft         coins_service.NFT
-			id          sql.NullString
-			nft_img     sql.NullString
-			comment     sql.NullString
-			user_id     sql.NullString
-			status      sql.NullString
-			telegram_id sql.NullString
-			created_at  sql.NullString
-			updated_at  sql.NullString
+			nft              coins_service.NFT
+			id               sql.NullString
+			nft_img          sql.NullString
+			comment          sql.NullString
+			user_id          sql.NullString
+			status           sql.NullString
+			telegram_id      sql.NullString
+			first_name       sql.NullString
+			last_name        sql.NullString
+			username         sql.NullString
+			card_number      sql.NullString
+			card_number_name sql.NullString
+			coin_nft_img     sql.NullString
+			created_at       sql.NullString
+			updated_at       sql.NullString
 		)
 
 		err = rowsNFT.Scan(
@@ -159,6 +205,12 @@ func (r *nftRepo) GetAll(ctx context.Context, req *coins_service.GetListNFTReque
 			&user_id,
 			&status,
 			&telegram_id,
+			&first_name.String,
+			&last_name,
+			&username,
+			&card_number,
+			&card_number_name,
+			&coin_nft_img,
 			&created_at,
 			&updated_at,
 		)
@@ -167,14 +219,19 @@ func (r *nftRepo) GetAll(ctx context.Context, req *coins_service.GetListNFTReque
 		}
 
 		nft = coins_service.NFT{
-			Id:         id.String,
-			NftImg:     nft_img.String,
-			Comment:    comment.String,
-			UserId:     user_id.String,
-			Status:     status.String,
-			TelegramId: telegram_id.String,
-			CreatedAt:  created_at.String,
-			UpdatedAt:  updated_at.String,
+			Id:             id.String,
+			NftImg:         nft_img.String,
+			Comment:        comment.String,
+			UserId:         user_id.String,
+			Status:         status.String,
+			TelegramId:     telegram_id.String,
+			FirstName:      first_name.String,
+			LastName:       last_name.String,
+			UserName:       username.String,
+			CardNamber:     card_number_name.String,
+			CardNumberName: card_number_name.String,
+			CreatedAt:      created_at.String,
+			UpdatedAt:      updated_at.String,
 		}
 
 		resp.Nfts = append(resp.Nfts, &nft)

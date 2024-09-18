@@ -19,6 +19,7 @@ func SetUpServer(cfg config.Config, log logger.LoggerI, strg storage.StorageI, s
 	coins_service.RegisterHistoryServiceServer(grpcServer, service.NewHistoryService(cfg, log, strg, srvc))
 	coins_service.RegisterTelegramPremiumServiceServer(grpcServer, service.NewTelegramPremiumService(cfg, log, strg, srvc))
 	coins_service.RegisterNFTServiceServer(grpcServer, service.NewNFTService(cfg, log, strg, srvc))
+	coins_service.RegisterCoinNFTServiceServer(grpcServer, service.NewCoinNftService(cfg, log, strg, srvc))
 	reflection.Register(grpcServer)
 	return
 }

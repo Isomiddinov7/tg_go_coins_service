@@ -125,17 +125,30 @@ CREATE TABLE IF NOT EXISTS "premium_transaction"(
     "updated_at" TIMESTAMP
 );
 
+CREATE TABLE IF NOT EXISTS "coin_nft"(
+    "id" UUID NOT NULL PRIMARY KEY,
+    "nft_img" VARCHAR NOT NULL,
+    "nft_price" VARCHAR NOT NULL,
+    "nft_address" VARCHAR NOT NULL,
+    "nft_name" VARCHAR NOT NULL,
+    "created_at" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP
+);
+
 CREATE TABLE IF NOT EXISTS "nft"(
     "id" UUID NOT NULL PRIMARY KEY,
     "nft_img" VARCHAR NOT NULL,
     "comment" VARCHAR NOT NULL,
     "user_id" UUID NOT NULL REFERENCES "users"("id"),
+    "coin_nft_id" UUID NOT NULL REFERENCES "coin_nft"("id"),
+    "telegram_id" VARCHAR NOT NULL,
+    "card_number" VARCHAR NOT NULL,
+    "card_number_name" VARCHAR NOT NULL,
     "status" TransactionStatus DEFAULT 'pending',
     "created_at" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP
 );
 
-ALTER TABLE "nft" ADD COLUMN telegram_id VARCHAR;
 
 
 -- INSERT INTO "admin"("id", "login", "password") VALUES('dbecf401-64b3-4b9b-829a-c8b061431286', 'Sayusupov1972', 'sayusupov1972');
@@ -145,6 +158,8 @@ ALTER TABLE "nft" ADD COLUMN telegram_id VARCHAR;
 --       {"HalfCoinAmount": "0.5", "HalfCoinPrice": "650000"},
 --       {"HalfCoinAmount": "0.8", "HalfCoinPrice": "80000"}
 -- ]
+
+
 
 
 

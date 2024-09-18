@@ -12,6 +12,7 @@ type StorageI interface {
 	History() HistoryUserRepoI
 	TelegramPremium() TelegramPremiumRepoI
 	NFT() NFTRepoI
+	CoinNFT() CoinNFTRepoI
 }
 
 type CoinRepoI interface {
@@ -49,4 +50,12 @@ type NFTRepoI interface {
 	GetAll(ctx context.Context, req *coins_service.GetListNFTRequest) (resp *coins_service.GetListNFTResponse, err error)
 	Update(ctx context.Context, req *coins_service.UpdateNFT) (rowsAffected int64, err error)
 	Delete(ctx context.Context, req *coins_service.NFTPrimaryKey) error
+}
+
+type CoinNFTRepoI interface {
+	Create(ctx context.Context, req *coins_service.CoinNFTCreate) (resp *coins_service.CoinNFT, err error)
+	GetById(ctx context.Context, req *coins_service.CoinNFTPrimaryKey) (resp *coins_service.CoinNFT, err error)
+	GetList(ctx context.Context, req *coins_service.GetListCoinNFTRequest) (resp *coins_service.GetListCoinNFTResponse, err error)
+	Update(ctx context.Context, req *coins_service.CoinNFTUpdate) (rowsAffected int64, err error)
+	Delete(ctx context.Context, req *coins_service.CoinNFTPrimaryKey) error
 }
