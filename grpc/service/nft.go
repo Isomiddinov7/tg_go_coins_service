@@ -75,3 +75,16 @@ func (i *NFTService) Update(ctx context.Context, req *coins_service.UpdateNFT) (
 
 	return resp, err
 }
+
+func (i *NFTService) Delete(ctx context.Context, req *coins_service.NFTPrimaryKey) (resp *coins_service.Empty, err error) {
+
+	i.log.Info("---DeleteNFT------>", logger.Any("req", req))
+
+	err = i.strg.NFT().Delete(ctx, req)
+	if err != nil {
+		i.log.Error("!!!DeleteNFT->NFT->Get--->", logger.Error(err))
+		return nil, status.Error(codes.InvalidArgument, err.Error())
+	}
+
+	return &coins_service.Empty{}, nil
+}

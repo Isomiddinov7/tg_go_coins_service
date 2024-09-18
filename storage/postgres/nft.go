@@ -28,8 +28,9 @@ func (r *nftRepo) Create(ctx context.Context, req *coins_service.CreateNFT) (res
 			"id",
 			"nft_img",
 			"comment",
-			"user_id"
-		) VALUES($1, $2, $3, $4)`
+			"user_id",
+			"telegram_id"
+		) VALUES($1, $2, $3, $4, $5)`
 	)
 
 	_, err = r.db.Exec(ctx, query,
@@ -37,6 +38,7 @@ func (r *nftRepo) Create(ctx context.Context, req *coins_service.CreateNFT) (res
 		req.NftImg,
 		req.Comment,
 		req.UserId,
+		req.TelegramId,
 	)
 	if err != nil {
 		return nil, err
@@ -53,19 +55,21 @@ func (r *nftRepo) GetById(ctx context.Context, req *coins_service.NFTPrimaryKey)
 				"comment",
 				"user_id",
 				"status",
+				"telegram_id",
 				"created_at",
 				"updated_at"
 			FROM "nft"
 			WHERE "id" = $1
 		`
 
-		id         sql.NullString
-		nft_img    sql.NullString
-		comment    sql.NullString
-		user_id    sql.NullString
-		status     sql.NullString
-		created_at sql.NullString
-		updated_at sql.NullString
+		id          sql.NullString
+		nft_img     sql.NullString
+		comment     sql.NullString
+		user_id     sql.NullString
+		status      sql.NullString
+		telegram_id sql.NullString
+		created_at  sql.NullString
+		updated_at  sql.NullString
 	)
 
 	err := r.db.QueryRow(ctx, query, req.Id).Scan(
@@ -74,6 +78,7 @@ func (r *nftRepo) GetById(ctx context.Context, req *coins_service.NFTPrimaryKey)
 		&comment,
 		&user_id,
 		&status,
+		&telegram_id,
 		&created_at,
 		&updated_at,
 	)
@@ -82,13 +87,14 @@ func (r *nftRepo) GetById(ctx context.Context, req *coins_service.NFTPrimaryKey)
 	}
 
 	return &coins_service.NFT{
-		Id:        id.String,
-		NftImg:    nft_img.String,
-		Comment:   comment.String,
-		UserId:    user_id.String,
-		Status:    status.String,
-		CreatedAt: created_at.String,
-		UpdatedAt: updated_at.String,
+		Id:         id.String,
+		NftImg:     nft_img.String,
+		Comment:    comment.String,
+		UserId:     user_id.String,
+		Status:     status.String,
+		TelegramId: telegram_id.String,
+		CreatedAt:  created_at.String,
+		UpdatedAt:  updated_at.String,
 	}, nil
 
 }
@@ -118,6 +124,7 @@ func (r *nftRepo) GetAll(ctx context.Context, req *coins_service.GetListNFTReque
 			"comment",
 			"user_id",
 			"status",
+			"telegram_id",
 			"created_at",
 			"updated_at"
 		FROM "nft"
@@ -133,14 +140,15 @@ func (r *nftRepo) GetAll(ctx context.Context, req *coins_service.GetListNFTReque
 
 	for rowsNFT.Next() {
 		var (
-			nft        coins_service.NFT
-			id         sql.NullString
-			nft_img    sql.NullString
-			comment    sql.NullString
-			user_id    sql.NullString
-			status     sql.NullString
-			created_at sql.NullString
-			updated_at sql.NullString
+			nft         coins_service.NFT
+			id          sql.NullString
+			nft_img     sql.NullString
+			comment     sql.NullString
+			user_id     sql.NullString
+			status      sql.NullString
+			telegram_id sql.NullString
+			created_at  sql.NullString
+			updated_at  sql.NullString
 		)
 
 		err = rowsNFT.Scan(
@@ -150,6 +158,7 @@ func (r *nftRepo) GetAll(ctx context.Context, req *coins_service.GetListNFTReque
 			&comment,
 			&user_id,
 			&status,
+			&telegram_id,
 			&created_at,
 			&updated_at,
 		)
@@ -158,13 +167,14 @@ func (r *nftRepo) GetAll(ctx context.Context, req *coins_service.GetListNFTReque
 		}
 
 		nft = coins_service.NFT{
-			Id:        id.String,
-			NftImg:    nft_img.String,
-			Comment:   comment.String,
-			UserId:    user_id.String,
-			Status:    status.String,
-			CreatedAt: created_at.String,
-			UpdatedAt: updated_at.String,
+			Id:         id.String,
+			NftImg:     nft_img.String,
+			Comment:    comment.String,
+			UserId:     user_id.String,
+			Status:     status.String,
+			TelegramId: telegram_id.String,
+			CreatedAt:  created_at.String,
+			UpdatedAt:  updated_at.String,
 		}
 
 		resp.Nfts = append(resp.Nfts, &nft)
@@ -192,4 +202,12 @@ func (r *nftRepo) Update(ctx context.Context, req *coins_service.UpdateNFT) (int
 	}
 
 	return rowsAffected.RowsAffected(), nil
+}
+
+func (r *nftRepo) Delete(ctx context.Context, req *coins_service.NFTPrimaryKey) error {
+	_, err := r.db.Exec(ctx, `DELETE FROM "nft" WHERE "id" = $1`, req.Id)
+	if err != nil {
+		return err
+	}
+	return nil
 }

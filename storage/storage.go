@@ -48,4 +48,5 @@ type NFTRepoI interface {
 	GetById(ctx context.Context, req *coins_service.NFTPrimaryKey) (resp *coins_service.NFT, err error)
 	GetAll(ctx context.Context, req *coins_service.GetListNFTRequest) (resp *coins_service.GetListNFTResponse, err error)
 	Update(ctx context.Context, req *coins_service.UpdateNFT) (rowsAffected int64, err error)
+	Delete(ctx context.Context, req *coins_service.NFTPrimaryKey) error
 }
