@@ -163,3 +163,29 @@ CREATE TABLE IF NOT EXISTS "nft"(
 
 
 
+-- UPDATE "coins"
+-- 			SET
+-- 				"name" = 'dogs',
+-- 				"coin_buy_price" = '14',
+-- 				"coin_sell_price" = '7',
+-- 				"address" = 'UQCkgzKX9Dl95MNwmE2-oHI46O6MYgtUwSHGtWXbUOwEj4lM',
+-- 				"card_number" = '5614-6816-2981-4371',
+-- 				"status" = 'true',
+-- 				"updated_at" = NOW()
+-- 		WHERE "id" = 'e00a3b12-69d8-4834-8765-d3f5acbdb47f'
+
+
+--         https://mynewpm.s3.ap-northeast-1.amazonaws.com/doge.jpg
+
+-- UPDATE "coins"
+-- 			SET
+-- 				"halfCoinAmount" = '0.3',
+-- 				"halfCoinPrice" = '40000'
+-- 				"updated_at" = NOW()
+-- 		WHERE "id" = 'b42414f8-9ec0-48f6-8d5e-f95d03e9f03b'
+
+-- INSERT INTO "half_coins_price"(
+--                 "coin_id",
+-- 				"halfCoinAmount",
+-- 				"halfCoinPrice"
+-- 			) VALUES ('b42414f8-9ec0-48f6-8d5e-f95d03e9f03b', '0.5', '65000');
