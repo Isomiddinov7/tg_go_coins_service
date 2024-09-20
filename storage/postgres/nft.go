@@ -74,7 +74,7 @@ func (r *nftRepo) GetById(ctx context.Context, req *coins_service.NFTPrimaryKey)
 			FROM "nft" as n
 			JOIN "users" as u ON n."user_id"=u."id"
 			JOIN "coin_nft" as cn ON cn."id"=n."coin_nft_id"
-			WHERE "id" = $1
+			WHERE n."id" = $1
 		`
 
 		id               sql.NullString
