@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"fmt"
 	"tg_go_coins_service/genproto/coins_service"
+	"tg_go_coins_service/pkg/helper"
 	"tg_go_coins_service/storage"
 
 	"github.com/google/uuid"
@@ -317,26 +318,31 @@ func (r *coinRepo) Update(ctx context.Context, req *coins_service.UpdateCoin) (i
 		query = `
 		UPDATE "coins"
 			SET
-				"name" = $2,
-				"coin_buy_price" = $3,
-				"coin_sell_price" = $4,
-				"address" = $5,
-				"card_number" = $6,
-				"status" = $7,
-				"updated_at" = NOW()
-		WHERE "id" = $1`
+				name = :name,
+				coin_buy_price = :coin_buy_price,
+				coin_sell_price = :coin_sell_price,
+				address = :address,
+				card_number = :card_number,
+				status = :status,
+				coin_icon = :coin_icon,
+				updated_at = NOW()
+		WHERE id = :id`
 	)
 
-	rowsAffected, err := r.db.Exec(ctx,
-		query,
-		req.Id,
-		req.Name,
-		req.CoinBuyPrice,
-		req.CoinSellPrice,
-		req.Address,
-		req.CardNumber,
-		req.Status,
-	)
+	params := map[string]interface{}{
+		"id":              req.GetId(),
+		"name":            req.GetName(),
+		"coin_buy_price":  req.GetCoinBuyPrice(),
+		"coin_sell_price": req.GetCoinSellPrice(),
+		"address":         req.GetAddress(),
+		"card_number":     req.GetCardNumber(),
+		"status":          req.GetStatus(),
+		"coin_icon":       req.GetCoinIcon(),
+	}
+
+	query, args := helper.ReplaceQueryParams(query, params)
+
+	result, err := r.db.Exec(ctx, query, args...)
 	if err != nil {
 		return 0, err
 	}
@@ -375,7 +381,7 @@ func (r *coinRepo) Update(ctx context.Context, req *coins_service.UpdateCoin) (i
 
 	}
 
-	return rowsAffected.RowsAffected(), nil
+	return result.RowsAffected(), nil
 }
 
 func (r *coinRepo) Delete(ctx context.Context, req *coins_service.CoinPrimaryKey) error {
