@@ -169,3 +169,11 @@ func (r *historyRepo) HistoryUserAll(ctx context.Context) (*coins_service.Histor
 	}
 	return &resp, nil
 }
+
+func (r *historyRepo) HistoryDelete(ctx context.Context) (err error) {
+	_, err = r.db.Exec(ctx, `DELETE FROM "user_transaction" WHERE "transaction_status" = 'error'`)
+	if err != nil {
+		return err
+	}
+	return nil
+}

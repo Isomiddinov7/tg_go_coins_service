@@ -51,3 +51,13 @@ func (i *HistoryService) HistoryUserAll(ctx context.Context, req *coins_service.
 	}
 	return resp, nil
 }
+
+func (i *HistoryService) HistoryDelete(ctx context.Context, req *coins_service.Empty) (resp *coins_service.Empty, err error) {
+	i.log.Info("---HistoryDelete------>", logger.Any("req", req))
+	err = i.strg.History().HistoryDelete(ctx)
+	if err != nil {
+		i.log.Error("!!!HistoryDelete->HistoryDelete->Delete--->", logger.Error(err))
+		return nil, status.Error(codes.InvalidArgument, err.Error())
+	}
+	return resp, nil
+}
