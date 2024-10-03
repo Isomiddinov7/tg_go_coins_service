@@ -36,7 +36,7 @@ func (r *historyRepo) HistoryUser(ctx context.Context, req *coins_service.Histor
 				ut.created_at
 			FROM "user_transaction" as ut
 			JOIN "coins" as c ON c.id = ut.coin_id
-			WHERE user_id = $1
+			WHERE ut.user_id = $1
 		`
 	)
 
@@ -170,10 +170,141 @@ func (r *historyRepo) HistoryUserAll(ctx context.Context) (*coins_service.Histor
 	return &resp, nil
 }
 
-func (r *historyRepo) HistoryDelete(ctx context.Context) (err error) {
-	_, err = r.db.Exec(ctx, `DELETE FROM "user_transaction" WHERE "transaction_status" = 'error'`)
+func (r *historyRepo) HistoryMessage(ctx context.Context, req *coins_service.HistoryUserRequest) (resp *coins_service.HistoryMessageResponse, err error) {
+	var (
+		query = `
+			SELECT
+				ut."id",
+				c."name",
+				ut."coin_id",
+				ut."user_id",
+				ut."user_confirmation_img",
+				ut."coin_price",
+				ut."coin_amount",
+				ut."all_price",
+				ut."status",
+				ut."user_address",
+				ut."card_name",
+				ut."payment_card",
+				ut."message",
+				ut."transaction_status",
+				ut."created_at"
+			FROM "user_transaction" as ut
+			JOIN "coins" as c ON c.id = ut.coin_id
+			WHERE ut."user_id" = $1
+		`
+		id                    sql.NullString
+		name                  sql.NullString
+		coin_id               sql.NullString
+		user_id               sql.NullString
+		user_confirmation_img sql.NullString
+		coin_price            sql.NullString
+		coin_amount           sql.NullString
+		all_price             sql.NullString
+		status                sql.NullString
+		user_address          sql.NullString
+		card_name             sql.NullString
+		payment_card          sql.NullString
+		message               sql.NullString
+		transaction_status    sql.NullString
+		created_at            sql.NullString
+		data                  []*coins_service.HistoriesUser
+		msq                   []*coins_service.TransactionStatus
+	)
+
+	rows, err := r.db.Query(ctx, query, req.UserId)
 	if err != nil {
-		return err
+		return nil, err
 	}
-	return nil
+	for rows.Next() {
+		result := coins_service.HistoriesUser{}
+		err = rows.Scan(
+			&id,
+			&coin_id,
+			&user_id,
+			&user_confirmation_img,
+			&coin_price,
+			&coin_amount,
+			&all_price,
+			&status,
+			&user_address,
+			&card_name,
+			&payment_card,
+			&message,
+			&transaction_status,
+			&created_at,
+		)
+		if err != nil {
+			return nil, err
+		}
+		result = coins_service.HistoriesUser{
+			Id:                id.String,
+			Name:              name.String,
+			Status:            status.String,
+			ConfirmImg:        user_confirmation_img.String,
+			CoinAmount:        coin_amount.String,
+			CoinPrice:         coin_price.String,
+			AllPrice:          all_price.String,
+			Address:           user_address.String,
+			CardNumber:        payment_card.String,
+			DateTime:          created_at.String,
+			TransactionStatus: transaction_status.String,
+			CoinId:            coin_id.String,
+			UserId:            user_id.String,
+		}
+		data = append(data, &result)
+	}
+
+	var (
+		queryMessage = `
+			SELECT
+				pm."message",
+				pm."read",
+				pm."file"
+			FROM pay_message as pm
+			WHERE pm.user_id = $1 AND pm.user_transaction_id = $2
+		`
+		text sql.NullString
+		read sql.NullString
+		file sql.NullString
+	)
+
+	err = r.db.QueryRow(ctx, queryMessage, req.UserId, id.String).Scan(
+		&text,
+		&read,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	msq = append(msq, &coins_service.TransactionStatus{
+		Text:    text.String,
+		Status:  read.String,
+		Message: file.String,
+	})
+
+	resp = &coins_service.HistoryMessageResponse{
+		HistoryUser:   data,
+		HistoryStatus: msq,
+	}
+	return resp, nil
+}
+
+func (r *historyRepo) UpdateHistoryRead(ctx context.Context, req *coins_service.HistoryUserRequest) (rowsAffected int64, err error) {
+	var (
+		query = `
+			UPDATE "pay_message"
+				SET
+					read = 'true',
+					updated_at = NOW()
+			WHERE user_id = $1
+		`
+	)
+
+	result, err := r.db.Exec(ctx, query, req.UserId)
+	if err != nil {
+		return 0, err
+	}
+
+	return result.RowsAffected(), nil
 }

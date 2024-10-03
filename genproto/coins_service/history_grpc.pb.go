@@ -19,9 +19,10 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	HistoryService_HistoryUser_FullMethodName    = "/coins_service.HistoryService/HistoryUser"
-	HistoryService_HistoryUserAll_FullMethodName = "/coins_service.HistoryService/HistoryUserAll"
-	HistoryService_HistoryDelete_FullMethodName  = "/coins_service.HistoryService/HistoryDelete"
+	HistoryService_HistoryUser_FullMethodName       = "/coins_service.HistoryService/HistoryUser"
+	HistoryService_HistoryUserAll_FullMethodName    = "/coins_service.HistoryService/HistoryUserAll"
+	HistoryService_HistoryMessage_FullMethodName    = "/coins_service.HistoryService/HistoryMessage"
+	HistoryService_UpdateHistoryRead_FullMethodName = "/coins_service.HistoryService/UpdateHistoryRead"
 )
 
 // HistoryServiceClient is the client API for HistoryService service.
@@ -30,7 +31,8 @@ const (
 type HistoryServiceClient interface {
 	HistoryUser(ctx context.Context, in *HistoryUserRequest, opts ...grpc.CallOption) (*HistoryUserResponse, error)
 	HistoryUserAll(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*HistoryUserResponse, error)
-	HistoryDelete(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*Empty, error)
+	HistoryMessage(ctx context.Context, in *HistoryUserRequest, opts ...grpc.CallOption) (*HistoryMessageResponse, error)
+	UpdateHistoryRead(ctx context.Context, in *HistoryUserRequest, opts ...grpc.CallOption) (*Empty, error)
 }
 
 type historyServiceClient struct {
@@ -61,10 +63,20 @@ func (c *historyServiceClient) HistoryUserAll(ctx context.Context, in *Empty, op
 	return out, nil
 }
 
-func (c *historyServiceClient) HistoryDelete(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*Empty, error) {
+func (c *historyServiceClient) HistoryMessage(ctx context.Context, in *HistoryUserRequest, opts ...grpc.CallOption) (*HistoryMessageResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(HistoryMessageResponse)
+	err := c.cc.Invoke(ctx, HistoryService_HistoryMessage_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *historyServiceClient) UpdateHistoryRead(ctx context.Context, in *HistoryUserRequest, opts ...grpc.CallOption) (*Empty, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(Empty)
-	err := c.cc.Invoke(ctx, HistoryService_HistoryDelete_FullMethodName, in, out, cOpts...)
+	err := c.cc.Invoke(ctx, HistoryService_UpdateHistoryRead_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -77,7 +89,8 @@ func (c *historyServiceClient) HistoryDelete(ctx context.Context, in *Empty, opt
 type HistoryServiceServer interface {
 	HistoryUser(context.Context, *HistoryUserRequest) (*HistoryUserResponse, error)
 	HistoryUserAll(context.Context, *Empty) (*HistoryUserResponse, error)
-	HistoryDelete(context.Context, *Empty) (*Empty, error)
+	HistoryMessage(context.Context, *HistoryUserRequest) (*HistoryMessageResponse, error)
+	UpdateHistoryRead(context.Context, *HistoryUserRequest) (*Empty, error)
 	mustEmbedUnimplementedHistoryServiceServer()
 }
 
@@ -94,8 +107,11 @@ func (UnimplementedHistoryServiceServer) HistoryUser(context.Context, *HistoryUs
 func (UnimplementedHistoryServiceServer) HistoryUserAll(context.Context, *Empty) (*HistoryUserResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method HistoryUserAll not implemented")
 }
-func (UnimplementedHistoryServiceServer) HistoryDelete(context.Context, *Empty) (*Empty, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method HistoryDelete not implemented")
+func (UnimplementedHistoryServiceServer) HistoryMessage(context.Context, *HistoryUserRequest) (*HistoryMessageResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method HistoryMessage not implemented")
+}
+func (UnimplementedHistoryServiceServer) UpdateHistoryRead(context.Context, *HistoryUserRequest) (*Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateHistoryRead not implemented")
 }
 func (UnimplementedHistoryServiceServer) mustEmbedUnimplementedHistoryServiceServer() {}
 func (UnimplementedHistoryServiceServer) testEmbeddedByValue()                        {}
@@ -154,20 +170,38 @@ func _HistoryService_HistoryUserAll_Handler(srv interface{}, ctx context.Context
 	return interceptor(ctx, in, info, handler)
 }
 
-func _HistoryService_HistoryDelete_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(Empty)
+func _HistoryService_HistoryMessage_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(HistoryUserRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(HistoryServiceServer).HistoryDelete(ctx, in)
+		return srv.(HistoryServiceServer).HistoryMessage(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: HistoryService_HistoryDelete_FullMethodName,
+		FullMethod: HistoryService_HistoryMessage_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(HistoryServiceServer).HistoryDelete(ctx, req.(*Empty))
+		return srv.(HistoryServiceServer).HistoryMessage(ctx, req.(*HistoryUserRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _HistoryService_UpdateHistoryRead_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(HistoryUserRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(HistoryServiceServer).UpdateHistoryRead(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: HistoryService_UpdateHistoryRead_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(HistoryServiceServer).UpdateHistoryRead(ctx, req.(*HistoryUserRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -188,8 +222,12 @@ var HistoryService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _HistoryService_HistoryUserAll_Handler,
 		},
 		{
-			MethodName: "HistoryDelete",
-			Handler:    _HistoryService_HistoryDelete_Handler,
+			MethodName: "HistoryMessage",
+			Handler:    _HistoryService_HistoryMessage_Handler,
+		},
+		{
+			MethodName: "UpdateHistoryRead",
+			Handler:    _HistoryService_UpdateHistoryRead_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
