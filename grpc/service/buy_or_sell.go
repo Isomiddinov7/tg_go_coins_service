@@ -17,7 +17,7 @@ type BuyOrSellService struct {
 	log      logger.LoggerI
 	strg     storage.StorageI
 	services client.ServiceManagerI
-	*coins_service.UnimplementedBuyOrSellServer
+	coins_service.UnimplementedBuyOrSellServer
 }
 
 func NewBuyOrSellService(cfg config.Config, log logger.LoggerI, strg storage.StorageI, srvs client.ServiceManagerI) *BuyOrSellService {

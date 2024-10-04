@@ -17,7 +17,7 @@ type CoinService struct {
 	log      logger.LoggerI
 	strg     storage.StorageI
 	services client.ServiceManagerI
-	*coins_service.UnimplementedCoinsServiceServer
+	coins_service.UnimplementedCoinsServiceServer
 }
 
 func NewCoinService(cfg config.Config, log logger.LoggerI, strg storage.StorageI, srvs client.ServiceManagerI) *CoinService {

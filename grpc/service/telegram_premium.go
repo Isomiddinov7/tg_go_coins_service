@@ -17,7 +17,7 @@ type PremiumService struct {
 	log      logger.LoggerI
 	strg     storage.StorageI
 	services client.ServiceManagerI
-	*coins_service.UnimplementedTelegramPremiumServiceServer
+	coins_service.UnimplementedTelegramPremiumServiceServer
 }
 
 func NewTelegramPremiumService(cfg config.Config, log logger.LoggerI, strg storage.StorageI, srvs client.ServiceManagerI) *PremiumService {

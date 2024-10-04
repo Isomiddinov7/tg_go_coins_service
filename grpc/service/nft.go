@@ -17,7 +17,7 @@ type NFTService struct {
 	log      logger.LoggerI
 	strg     storage.StorageI
 	services client.ServiceManagerI
-	*coins_service.UnimplementedNFTServiceServer
+	coins_service.UnimplementedNFTServiceServer
 }
 
 func NewNFTService(cfg config.Config, log logger.LoggerI, strg storage.StorageI, srvs client.ServiceManagerI) *NFTService {

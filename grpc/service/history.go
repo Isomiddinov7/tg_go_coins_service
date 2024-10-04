@@ -17,7 +17,7 @@ type HistoryService struct {
 	log      logger.LoggerI
 	strg     storage.StorageI
 	services client.ServiceManagerI
-	*coins_service.UnimplementedHistoryServiceServer
+	coins_service.UnimplementedHistoryServiceServer
 }
 
 func NewHistoryService(cfg config.Config, log logger.LoggerI, strg storage.StorageI, srvs client.ServiceManagerI) *HistoryService {

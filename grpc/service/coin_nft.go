@@ -17,7 +17,7 @@ type CoinNftService struct {
 	log      logger.LoggerI
 	strg     storage.StorageI
 	services client.ServiceManagerI
-	*coins_service.UnimplementedCoinNFTServiceServer
+	coins_service.UnimplementedCoinNFTServiceServer
 }
 
 func NewCoinNftService(cfg config.Config, log logger.LoggerI, strg storage.StorageI, srvs client.ServiceManagerI) *CoinNftService {
