@@ -41,7 +41,11 @@ message TransactionStatus{
     string message = 3;
 }
 
-message HistoryMessageResponse{
-    repeated HistoriesUser history_user = 1;
-    repeated TransactionStatus history_status = 2;
+message HistoryUserWithStatus {
+    HistoriesUser history_user = 1;
+    TransactionStatus history_status = 2;
+}
+
+message HistoryMessageResponse {
+    repeated HistoryUserWithStatus history_with_status = 1;
 }

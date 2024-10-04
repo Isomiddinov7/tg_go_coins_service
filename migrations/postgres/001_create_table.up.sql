@@ -150,6 +150,12 @@ CREATE TABLE IF NOT EXISTS "nft"(
 );
 
 
+ALTER TABLE users
+ADD block_time TIMESTAMP;
+
+ALTER TABLE users
+ADD warnig_count VARCHAR DEFAULT '0';
+
 
 -- INSERT INTO "admin"("id", "login", "password") VALUES('dbecf401-64b3-4b9b-829a-c8b061431286', 'Sayusupov1972', 'sayusupov1972');
 -- INSERT INTO "super_admin"("id","login","password") VALUES('690d15b1-b3bf-416f-83e1-02b183ccb2f2', 'azam1222', '938791222');
