@@ -3,7 +3,6 @@ package postgres
 import (
 	"context"
 	"database/sql"
-	"fmt"
 	"tg_go_coins_service/genproto/coins_service"
 	"tg_go_coins_service/storage"
 
@@ -240,9 +239,6 @@ func (r *historyRepo) HistoryMessage(ctx context.Context, req *coins_service.His
 			return nil, err
 		}
 
-		// Log user_id va transaction_id uchun
-		fmt.Printf("pay_message so'rovi uchun user_id: %s, user_transaction_id: %s\n", req.UserId, id.String)
-
 		var (
 			queryMessage = `
 				SELECT
@@ -259,8 +255,6 @@ func (r *historyRepo) HistoryMessage(ctx context.Context, req *coins_service.His
 
 		err = r.db.QueryRow(ctx, queryMessage, req.UserId, id.String).Scan(&text, &read, &file)
 		if err == sql.ErrNoRows {
-			// Agar xabar topilmasa, log yozamiz
-			fmt.Printf("Xabar topilmadi: user_id: %s, user_transaction_id: %s\n", req.UserId, id.String)
 
 			result := &coins_service.HistoryUserWithStatus{
 				HistoryUser: &coins_service.HistoriesUser{
@@ -284,36 +278,35 @@ func (r *historyRepo) HistoryMessage(ctx context.Context, req *coins_service.His
 			continue
 		} else if err != nil {
 			return nil, err
+		} else {
+
+			result := &coins_service.HistoryUserWithStatus{
+				HistoryUser: &coins_service.HistoriesUser{
+					Id:                id.String,
+					Name:              name.String,
+					Status:            status.String,
+					ConfirmImg:        user_confirmation_img.String,
+					CoinAmount:        coin_amount.String,
+					CoinPrice:         coin_price.String,
+					AllPrice:          all_price.String,
+					Address:           user_address.String,
+					CardNumber:        payment_card.String,
+					DateTime:          created_at.String,
+					TransactionStatus: transaction_status.String,
+					CoinId:            coin_id.String,
+					UserId:            user_id.String,
+				},
+				HistoryStatus: &coins_service.TransactionStatus{
+					Text:    text.String,
+					Status:  read.String,
+					Message: file.String,
+				},
+			}
+			data = append(data, result)
 		}
 
-		// Xabar topilganda natija yaratiladi
-		result := &coins_service.HistoryUserWithStatus{
-			HistoryUser: &coins_service.HistoriesUser{
-				Id:                id.String,
-				Name:              name.String,
-				Status:            status.String,
-				ConfirmImg:        user_confirmation_img.String,
-				CoinAmount:        coin_amount.String,
-				CoinPrice:         coin_price.String,
-				AllPrice:          all_price.String,
-				Address:           user_address.String,
-				CardNumber:        payment_card.String,
-				DateTime:          created_at.String,
-				TransactionStatus: transaction_status.String,
-				CoinId:            coin_id.String,
-				UserId:            user_id.String,
-			},
-			HistoryStatus: &coins_service.TransactionStatus{
-				Text:    text.String,
-				Status:  read.String,
-				Message: file.String,
-			},
-		}
-
-		data = append(data, result)
 	}
 
-	// Javob yaratiladi
 	resp = &coins_service.HistoryMessageResponse{
 		HistoryWithStatus: data,
 	}
