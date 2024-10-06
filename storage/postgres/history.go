@@ -3,6 +3,7 @@ package postgres
 import (
 	"context"
 	"database/sql"
+	"fmt"
 	"tg_go_coins_service/genproto/coins_service"
 	"tg_go_coins_service/storage"
 
@@ -169,7 +170,6 @@ func (r *historyRepo) HistoryUserAll(ctx context.Context) (*coins_service.Histor
 	}
 	return &resp, nil
 }
-
 func (r *historyRepo) HistoryMessage(ctx context.Context, req *coins_service.HistoryUserRequest) (resp *coins_service.HistoryMessageResponse, err error) {
 	var (
 		query = `
@@ -240,6 +240,9 @@ func (r *historyRepo) HistoryMessage(ctx context.Context, req *coins_service.His
 			return nil, err
 		}
 
+		// Log user_id va transaction_id uchun
+		fmt.Printf("pay_message so'rovi uchun user_id: %s, user_transaction_id: %s\n", req.UserId, id.String)
+
 		var (
 			queryMessage = `
 				SELECT
@@ -256,6 +259,9 @@ func (r *historyRepo) HistoryMessage(ctx context.Context, req *coins_service.His
 
 		err = r.db.QueryRow(ctx, queryMessage, req.UserId, id.String).Scan(&text, &read, &file)
 		if err == sql.ErrNoRows {
+			// Agar xabar topilmasa, log yozamiz
+			fmt.Printf("Xabar topilmadi: user_id: %s, user_transaction_id: %s\n", req.UserId, id.String)
+
 			result := &coins_service.HistoryUserWithStatus{
 				HistoryUser: &coins_service.HistoriesUser{
 					Id:                id.String,
@@ -280,6 +286,7 @@ func (r *historyRepo) HistoryMessage(ctx context.Context, req *coins_service.His
 			return nil, err
 		}
 
+		// Xabar topilganda natija yaratiladi
 		result := &coins_service.HistoryUserWithStatus{
 			HistoryUser: &coins_service.HistoriesUser{
 				Id:                id.String,
@@ -306,6 +313,7 @@ func (r *historyRepo) HistoryMessage(ctx context.Context, req *coins_service.His
 		data = append(data, result)
 	}
 
+	// Javob yaratiladi
 	resp = &coins_service.HistoryMessageResponse{
 		HistoryWithStatus: data,
 	}
