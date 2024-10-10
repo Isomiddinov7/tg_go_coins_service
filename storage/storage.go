@@ -44,6 +44,7 @@ type TelegramPremiumRepoI interface {
 	GetList(ctx context.Context, req *coins_service.GetListPremiumRequest) (resp *coins_service.GetPremiumTransactionResponse, err error)
 	GetPremiumList(ctx context.Context, req *coins_service.GetPremiumListRequest) (resp *coins_service.GetPremiumListResponse, err error)
 	GetPremiumTransactionById(ctx context.Context, req *coins_service.GetPremiumTransactionPrimaryKey) (resp *coins_service.GetPremiumTransactionId, err error)
+	Update(ctx context.Context, req *coins_service.UpdatePrice) (rowsAffected int64, err error)
 }
 
 type NFTRepoI interface {

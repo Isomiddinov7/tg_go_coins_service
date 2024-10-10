@@ -9,11 +9,19 @@ service TelegramPremiumService{
     rpc CreatePrice(CreateTelegramPremiumPrice) returns(TelegramPremiumPrice){}
     rpc CreatePremium(CreateTelegramPremium)returns(TelegramPremium){}
     rpc GetPremiumById(TelegramPriemiumPrimaryKey) returns(TelegramPremium){}
+    rpc Update(UpdatePrice) returns(Empty){}
     rpc GetPremiumList(GetPremiumListRequest) returns(GetPremiumListResponse){}
     rpc UpdateTransactionStatus(UpdateStatus) returns(Empty){}
     rpc PremiumTransaction(PremiumTransactionRequest) returns(Empty){}
     rpc GetList(GetListPremiumRequest) returns(GetPremiumTransactionResponse){}
     rpc GetPremiumTransactionById(GetPremiumTransactionPrimaryKey) returns(GetPremiumTransactionId){}
+}
+
+
+message UpdatePrice{
+    string price_id = 1;
+    string price = 2;
+    string updated_at = 3;
 }
 
 message TelegramPremium{

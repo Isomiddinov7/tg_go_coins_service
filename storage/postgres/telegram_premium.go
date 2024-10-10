@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"fmt"
 	"tg_go_coins_service/genproto/coins_service"
+	"tg_go_coins_service/pkg/helper"
 	"tg_go_coins_service/storage"
 
 	"github.com/google/uuid"
@@ -482,4 +483,30 @@ func (r *premiumRepo) GetPremiumList(ctx context.Context, req *coins_service.Get
 
 	return &resp, nil
 
+}
+
+func (r *premiumRepo) Update(ctx context.Context, req *coins_service.UpdatePrice) (rowsAffected int64, err error) {
+	var (
+		query = `
+			UPDATE "premium_price_month"
+				SET 
+					price = :price,
+					updated_at = NOW()
+				WHERE id = :id
+		`
+	)
+
+	params := map[string]interface{}{
+		"id":    req.GetPriceId(),
+		"price": req.GetPrice(),
+	}
+
+	query, args := helper.ReplaceQueryParams(query, params)
+
+	result, err := r.db.Exec(ctx, query, args...)
+	if err != nil {
+		return 0, err
+	}
+
+	return result.RowsAffected(), nil
 }

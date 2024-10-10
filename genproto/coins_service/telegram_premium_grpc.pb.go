@@ -22,6 +22,7 @@ const (
 	TelegramPremiumService_CreatePrice_FullMethodName               = "/coins_service.TelegramPremiumService/CreatePrice"
 	TelegramPremiumService_CreatePremium_FullMethodName             = "/coins_service.TelegramPremiumService/CreatePremium"
 	TelegramPremiumService_GetPremiumById_FullMethodName            = "/coins_service.TelegramPremiumService/GetPremiumById"
+	TelegramPremiumService_Update_FullMethodName                    = "/coins_service.TelegramPremiumService/Update"
 	TelegramPremiumService_GetPremiumList_FullMethodName            = "/coins_service.TelegramPremiumService/GetPremiumList"
 	TelegramPremiumService_UpdateTransactionStatus_FullMethodName   = "/coins_service.TelegramPremiumService/UpdateTransactionStatus"
 	TelegramPremiumService_PremiumTransaction_FullMethodName        = "/coins_service.TelegramPremiumService/PremiumTransaction"
@@ -36,6 +37,7 @@ type TelegramPremiumServiceClient interface {
 	CreatePrice(ctx context.Context, in *CreateTelegramPremiumPrice, opts ...grpc.CallOption) (*TelegramPremiumPrice, error)
 	CreatePremium(ctx context.Context, in *CreateTelegramPremium, opts ...grpc.CallOption) (*TelegramPremium, error)
 	GetPremiumById(ctx context.Context, in *TelegramPriemiumPrimaryKey, opts ...grpc.CallOption) (*TelegramPremium, error)
+	Update(ctx context.Context, in *UpdatePrice, opts ...grpc.CallOption) (*Empty, error)
 	GetPremiumList(ctx context.Context, in *GetPremiumListRequest, opts ...grpc.CallOption) (*GetPremiumListResponse, error)
 	UpdateTransactionStatus(ctx context.Context, in *UpdateStatus, opts ...grpc.CallOption) (*Empty, error)
 	PremiumTransaction(ctx context.Context, in *PremiumTransactionRequest, opts ...grpc.CallOption) (*Empty, error)
@@ -75,6 +77,16 @@ func (c *telegramPremiumServiceClient) GetPremiumById(ctx context.Context, in *T
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(TelegramPremium)
 	err := c.cc.Invoke(ctx, TelegramPremiumService_GetPremiumById_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *telegramPremiumServiceClient) Update(ctx context.Context, in *UpdatePrice, opts ...grpc.CallOption) (*Empty, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(Empty)
+	err := c.cc.Invoke(ctx, TelegramPremiumService_Update_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -138,6 +150,7 @@ type TelegramPremiumServiceServer interface {
 	CreatePrice(context.Context, *CreateTelegramPremiumPrice) (*TelegramPremiumPrice, error)
 	CreatePremium(context.Context, *CreateTelegramPremium) (*TelegramPremium, error)
 	GetPremiumById(context.Context, *TelegramPriemiumPrimaryKey) (*TelegramPremium, error)
+	Update(context.Context, *UpdatePrice) (*Empty, error)
 	GetPremiumList(context.Context, *GetPremiumListRequest) (*GetPremiumListResponse, error)
 	UpdateTransactionStatus(context.Context, *UpdateStatus) (*Empty, error)
 	PremiumTransaction(context.Context, *PremiumTransactionRequest) (*Empty, error)
@@ -161,6 +174,9 @@ func (UnimplementedTelegramPremiumServiceServer) CreatePremium(context.Context, 
 }
 func (UnimplementedTelegramPremiumServiceServer) GetPremiumById(context.Context, *TelegramPriemiumPrimaryKey) (*TelegramPremium, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetPremiumById not implemented")
+}
+func (UnimplementedTelegramPremiumServiceServer) Update(context.Context, *UpdatePrice) (*Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Update not implemented")
 }
 func (UnimplementedTelegramPremiumServiceServer) GetPremiumList(context.Context, *GetPremiumListRequest) (*GetPremiumListResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetPremiumList not implemented")
@@ -249,6 +265,24 @@ func _TelegramPremiumService_GetPremiumById_Handler(srv interface{}, ctx context
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(TelegramPremiumServiceServer).GetPremiumById(ctx, req.(*TelegramPriemiumPrimaryKey))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _TelegramPremiumService_Update_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdatePrice)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TelegramPremiumServiceServer).Update(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: TelegramPremiumService_Update_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TelegramPremiumServiceServer).Update(ctx, req.(*UpdatePrice))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -361,6 +395,10 @@ var TelegramPremiumService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetPremiumById",
 			Handler:    _TelegramPremiumService_GetPremiumById_Handler,
+		},
+		{
+			MethodName: "Update",
+			Handler:    _TelegramPremiumService_Update_Handler,
 		},
 		{
 			MethodName: "GetPremiumList",

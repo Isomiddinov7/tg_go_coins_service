@@ -122,3 +122,15 @@ func (i *PremiumService) GetPremiumTransactionById(ctx context.Context, req *coi
 	}
 	return resp, nil
 }
+
+func (i *PremiumService) Update(ctx context.Context, req *coins_service.UpdatePrice) (resp *coins_service.Empty, err error) {
+
+	i.log.Info("---Update------>", logger.Any("req", req))
+	_, err = i.strg.TelegramPremium().Update(ctx, req)
+	if err != nil {
+		i.log.Error("!!!Update->TelegramPremium->Update--->", logger.Error(err))
+		return nil, status.Error(codes.InvalidArgument, err.Error())
+	}
+
+	return resp, nil
+}
